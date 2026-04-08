@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MOGI WAITLIST v1.0</title>
+    <!-- Sets your new logo as the official browser tab icon -->
+    <link rel="icon" type="image/png" href="https://i.ibb.co/HLZYQZZ7/Create-logo-based-202603211131-Photoroom-1.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Permanent+Marker&display=swap');
+
+        /* =========================================
+           GLOBAL RESETS
+           ========================================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            height: 100%; width: 100%;
+            overflow: hidden;
+            background-color: black;
+            font-family: 'Tahoma', sans-serif;
+            overscroll-behavior: none;
+        }
+
+        /* =========================================
+           WINDOWS XP DESKTOP
+           ========================================= */
+        .desktop-environment {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url('https://i.ibb.co/S4knw0hW/baxpckground.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+        }
+
+        .desktop-icons { display: flex; flex-direction: column; gap: 20px; padding: 15px; }
+        .icon-wrapper { display: flex; flex-direction: column; align-items: center; width: 65px; text-align: center; cursor: pointer; }
+        .icon-wrapper img, .icon-wrapper svg { width: 34px; height: 34px; margin-bottom: 4px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.5)); }
+        .icon-wrapper span { color: white; font-size: 11px; text-shadow: 1px 1px 2px black; font-family: 'Tahoma', sans-serif; word-wrap: break-word; }
+
+        /* Taskbar */
+        .taskbar {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 30px;
+            background: linear-gradient(to bottom, #245edb 0%, #3f8cf3 9%, #245edb 18%, #245edb 92%, #1941a5 100%);
+            display: flex; justify-content: space-between; align-items: center; 
+            z-index: 2000;
+            box-shadow: 0 -1px 2px rgba(0,0,0,0.3);
+        }
+        .start-button {
+            height: 100%; padding: 0 15px 0 10px;
+            background: linear-gradient(to bottom, #429e33 0%, #358225 10%, #29691b 100%);
+            color: white; font-style: italic; font-weight: bold; font-size: 16px;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+            border-radius: 0 10px 10px 0;
+            box-shadow: inset 1px 1px 2px rgba(255,255,255,0.4), 2px 0 3px rgba(0,0,0,0.4);
+        }
+        .start-button svg { width: 18px; height: 18px; fill: white; }
+        .system-tray {
+            height: 100%; padding: 0 10px; color: white; font-size: 11px; display: flex; align-items: center;
+            background: linear-gradient(to bottom, #119ae4 0%, #0c72ce 10%, #0a5eb5 100%);
+            border-left: 1px solid rgba(255,255,255,0.2);
+        }
+        .taskbar-tasks {
+            flex-grow: 1; display: flex; align-items: center; padding: 0 10px; height: 100%;
+        }
+        .task-tab {
+            display: flex; align-items: center; gap: 5px;
+            background: linear-gradient(to bottom, #1b4bba 0%, #153b96 100%);
+            color: white; padding: 0 8px; height: 24px; border-radius: 3px;
+            box-shadow: inset 1px 1px 3px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.3);
+            font-size: 11px; font-family: 'Tahoma', sans-serif; width: 150px; cursor: default;
+            opacity: 0; transition: opacity 0.3s ease-out;
+        }
+        .task-tab.visible { opacity: 1; }
+        .task-tab img { width: 14px; height: 14px; }
+
+        /* =========================================
+           STABLE POPUP LOGIC
+           ========================================= */
+        .retro-popup {
+            position: fixed; 
+            top: 50%; left: 50%; 
+            width: min(90vw, 600px); 
+            height: min(60vh, 450px);
+            transform: translate(-50%, -50%) scale(0); 
+            opacity: 0;
+            background: #ece9d8; border: 3px solid #0058e6; border-radius: 8px 8px 0 0;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column;
+            z-index: 1000; overflow: hidden;
+            transition: opacity 0.3s ease-out, transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                        top 0.6s cubic-bezier(0.4, 0, 0.2, 1), left 0.6s cubic-bezier(0.4, 0, 0.2, 1), 
+                        width 0.6s cubic-bezier(0.4, 0, 0.2, 1), height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .retro-popup.pop-in { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+
+        .retro-popup.fullscreen {
+            top: 0 !important; left: 0 !important;
+            width: 100% !important; 
+            height: calc(100% - 30px) !important; 
+            transform: translate(0, 0) scale(1) !important;
+            border-width: 0px; border-radius: 0px;
+            opacity: 1;
+        }
+
+        .title-bar {
+            background: linear-gradient(to right, #0058e6 0%, #3f8cf3 100%); padding: 4px 6px; 
+            display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
+        }
+        .title-bar-text { color: white; font-family: 'Trebuchet MS', sans-serif; font-size: 13px; font-weight: bold; display: flex; align-items: center; gap: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .title-bar-text img { width: 14px; height: 14px; flex-shrink: 0; }
+        .title-bar-controls { display: flex; gap: 2px; flex-shrink: 0; }
+        .control-btn {
+            width: 21px; height: 21px; background: linear-gradient(to bottom, #fff, #c0c0c0);
+            border: 1px solid #fff; border-right-color: #666; border-bottom-color: #666; border-radius: 3px; 
+            display: flex; justify-content: center; align-items: center; font-size: 12px; font-weight: bold;
+        }
+        .close-btn { background: linear-gradient(to bottom, #eab1a6, #d9533a); color: white; border-color: #f7a496; }
+
+        .ie-toolbar { background: #ece9d8; padding: 3px 8px; display: flex; gap: 12px; font-size: 11px; color: #000; border-bottom: 1px solid #fff; box-shadow: 0 1px 0 #aca899; overflow: hidden; white-space: nowrap; }
+        .ie-address-bar { background: #ece9d8; padding: 4px 8px; display: flex; align-items: center; gap: 8px; font-size: 11px; border-bottom: 1px solid #aca899; }
+        .address-input { background: #fff; border: 1px solid #7f9db9; padding: 2px 6px; flex-grow: 1; font-family: sans-serif; font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
+
+        /* =========================================
+           WAITLIST WEBSITE CONTENT
+           ========================================= */
+        .window-body {
+            flex-grow: 1; position: relative; width: 100%; height: 100%;
+            background-color: #050505; overflow: hidden; 
+            font-family: 'Courier Prime', monospace; cursor: crosshair;
+        }
+
+        .vhs-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 6px 100%;
+            z-index: 2; pointer-events: none; opacity: 0.7;
+        }
+
+        .vhs-noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.08'/%3E%3C/svg%3E");
+            z-index: 3; pointer-events: none; mix-blend-mode: overlay;
+        }
+
+        .wall-bg {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #1a1a1a;
+            background-image: url('https://i.pinimg.com/1200x/a3/29/59/a329597bb919f61c6df36039767bb424.jpg');
+            background-size: cover; background-position: center;
+            opacity: 1; z-index: 1; filter: sepia(0.3) contrast(1.1) saturate(0.8) hue-rotate(-5deg);
+        }
+
+        .scene {
+            position: relative; width: 100%; height: 100%; 
+            z-index: 10; display: flex; justify-content: center; align-items: center;
+        }
+
+        /* Memo sizing for Desktop */
+        .memo-wrapper {
+            position: absolute; width: 100%; max-width: 1155px; aspect-ratio: 2063 / 1160; 
+            opacity: 0; transform: scale(2) translateY(100vh) rotate(15deg);
+        }
+        
+        .play-anim .memo-wrapper {
+            animation: memoSlap 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            animation-delay: 0.2s; 
+        }
+        @keyframes memoSlap { 
+            0% { transform: scale(2) translateY(100vh) rotate(15deg); opacity: 0; }
+            50% { transform: scale(0.95) translateY(0) rotate(-4deg); opacity: 1; } /* IMPACT: Syncs perfectly with hand at 0.2s */
+            75% { transform: scale(1.02) translateY(0) rotate(-1deg); opacity: 1; } /* Rebounds slightly */
+            100% { transform: scale(1) translateY(0) rotate(-2deg); opacity: 1; } /* Settles perfectly */
+        }
+
+        .memo-base-img {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
+            filter: sepia(0.3) contrast(1.1) saturate(0.8) hue-rotate(-5deg) drop-shadow(0px 20px 30px rgba(0,0,0,0.8));
+            z-index: 1; pointer-events: none;
+        }
+
+        .memo {
+            position: absolute; top: 24%; bottom: 20%; left: 28%; right: 28%; z-index: 10;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            color: #050505; text-align: center; overflow: visible; 
+        }
+
+        .separator { letter-spacing: -2px; overflow: hidden; white-space: nowrap; margin: 8px 0; color: rgba(26,26,26,0.6); font-weight: bold; width: 100%; font-size: 0.8rem; }
+        .title { font-weight: bold; font-size: 1.1rem; margin-bottom: 2px; }
+        .intro { font-weight: bold; margin-bottom: 8px; font-size: 0.85rem; }
+        .body-text { font-size: 0.75rem; line-height: 1.4; margin-bottom: 8px; }
+
+        form { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; justify-content: center; }
+        .input-group { border: 2px solid rgba(15,15,15,0.9); padding: 4px; width: 100%; max-width: 280px; }
+        input[type="email"] { width: 100%; background: transparent; border: none; font-family: inherit; font-size: 0.8rem; color: #050505; outline: none; text-align: center; font-weight: bold; }
+        button { background: #050505; color: #fdf5c9; border: none; padding: 8px; font-family: inherit; font-weight: bold; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 280px; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); }
+
+        .spray-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 60; }
+        .mogi-logo { width: 100%; max-width: 650px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
+        .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
+        .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('https://i.ibb.co/3mjQZDPS/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
+        
+        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
+
+        @keyframes sprayCanAnim {
+            0% { opacity: 0; transform: translate(300px, -200px) rotate(-20deg); }
+            10% { opacity: 1; transform: translate(150px, -150px) rotate(-15deg); }
+            20% { transform: translate(-200px, -100px) rotate(-10deg); }
+            30% { transform: translate(200px, -50px) rotate(-15deg); }
+            40% { transform: translate(-150px, 20px) rotate(-10deg); }
+            50% { transform: translate(150px, 100px) rotate(-15deg); }
+            60% { transform: translate(-100px, 350px) rotate(-5deg); }
+            75% { transform: translate(150px, 400px) rotate(-10deg); }
+            90% { opacity: 1; transform: translate(300px, 600px) rotate(10deg); }
+            100% { opacity: 0; transform: translate(450px, 700px) rotate(20deg); }
+        }
+
+        @keyframes spraySplatterAnim { 0% { opacity: 0; transform: scale(0.8); } 20% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
+        @keyframes fadeInProgressive { from { opacity: 0; filter: blur(15px); } to { opacity: 0.95; filter: blur(0.5px); } }
+
+        /* Hand Animation for Desktop - Faster, Snappy Slap */
+        .hand-overlay { position: absolute; top: 50%; left: 50%; width: 600px; height: 600px; margin-top: -300px; margin-left: -300px; pointer-events: none; z-index: 50; opacity: 0; transform: scale(2) translateY(150%); }
+        .play-anim .hand-overlay { 
+            animation: handSlapAnim 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+            animation-delay: 0.2s; 
+        }
+        @keyframes handSlapAnim { 
+            0% { transform: scale(1.5) translateY(150%); opacity: 0; } 
+            12% { transform: scale(1.2) translateY(50%); opacity: 1; }
+            25% { transform: scale(1) translateY(0) rotate(-10deg); opacity: 1; } /* IMPACT: Hits at the exact same millisecond as memo */
+            55% { transform: scale(1) translateY(0) rotate(-10deg); opacity: 1; } /* Hold visible to make it readable */
+            100% { transform: scale(0.9) translateY(150%); opacity: 0; } 
+        }
+        
+        .hand-img { width: 100%; height: 100%; object-fit: contain; filter: sepia(0.3) brightness(0.85) contrast(1.2) drop-shadow(0px 20px 40px rgba(0,0,0,0.9)); }
+
+        /* =========================================
+           MOBILE OPTIMIZATION
+           ========================================= */
+        @media (max-width: 600px) {
+            /* Taskbar */
+            .start-button { font-size: 14px; padding: 0 8px 0 5px; }
+            .start-button svg { width: 15px; height: 15px; }
+            .system-tray { font-size: 10px; padding: 0 8px; }
+            .task-tab { width: auto; flex-grow: 1; max-width: 120px; }
+            .task-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+            /* Desktop icon tweaks */
+            .desktop-icons { padding: 10px; }
+            .icon-wrapper { width: 60px; }
+            
+            /* IE Toolbars */
+            .ie-toolbar span:not(:first-child):not(:nth-child(2)) { display: none; }
+            .ie-toolbar { gap: 8px; font-size: 10px; }
+            .address-input { font-size: 10px; padding: 2px 4px; }
+
+            /* 1. Memo sizing: Reduced from 200% to 160% so you can see more background */
+            .memo-wrapper { width: 160%; flex-shrink: 0; }
+            
+            /* SYNCED mobile memo animation */
+            .play-anim .memo-wrapper { 
+                animation: memoSlap 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+                animation-delay: 0.2s; 
+            }
+            
+            /* Exact coordinates for the yellow box boundaries */
+            .memo { 
+                top: 24%; bottom: 20%; 
+                left: 28%; right: 28%; 
+            }
+
+            /* 2. Micro-typography - Scaled down further to fit the new smaller note */
+            .title { font-size: 0.75rem; margin-bottom: 2px; }
+            .intro { font-size: 0.6rem; margin-bottom: 4px; }
+            .body-text { font-size: 0.5rem; line-height: 1.2; margin-bottom: 4px; }
+            .separator { margin: 3px 0; font-size: 0.5rem; letter-spacing: -1.5px; overflow: hidden; }
+            
+            /* Form Box and Button Scaling */
+            form { gap: 3px; width: 80%; }
+            .input-group { padding: 2px; border-width: 1px; width: 100%; max-width: 100%; }
+            input[type="email"] { font-size: 0.5rem; padding: 2px; }
+            button { padding: 4px; font-size: 0.5rem; width: 100%; max-width: 100%; box-shadow: 1px 1px 0px rgba(0,0,0,0.5); }
+            
+            /* Spray assets scaling */
+            .spray-can { width: 100px; }
+            .mogi-logo { max-width: 340px; }
+            
+            /* 3. DEDICATED MOBILE HAND ANIMATION - Faster, Snappy Slap */
+            .hand-overlay { width: 260px; height: 260px; margin-top: -130px; margin-left: -130px; }
+            
+            /* Overriding the animation call specifically for mobile devices */
+            .play-anim .hand-overlay { 
+                animation: mobileHandSlap 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards; 
+                animation-delay: 0.2s; 
+                will-change: transform;
+            }
+        }
+
+        /* Mobile specific keyframes: Faster, Snappy Slap */
+        @keyframes mobileHandSlap {
+            0% { transform: scale(1.5) translateY(800px); opacity: 0; }
+            12% { transform: scale(1.2) translateY(300px); opacity: 1; }
+            /* Arrives on screen with force at 25% (0.2s) */
+            25% { transform: scale(0.9) translateY(0) rotate(-10deg); opacity: 1; } /* IMPACT */
+            /* Holds perfectly still until 55% so the user clearly sees it pinned */
+            55% { transform: scale(0.9) translateY(0) rotate(-10deg); opacity: 1; }
+            /* Slides away cleanly */
+            100% { transform: scale(0.8) translateY(800px); opacity: 0; }
+        }
+        
+        /* For extremely small phones (e.g. iPhone SE) */
+        @media (max-width: 380px) {
+            .memo-wrapper { width: 180%; }
+            .title { font-size: 0.65rem; }
+            .intro { font-size: 0.5rem; }
+            .body-text { font-size: 0.45rem; }
+            .separator { font-size: 0.45rem; }
+            input[type="email"], button { font-size: 0.45rem; padding: 2px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 1. The Windows XP Desktop -->
+    <div class="desktop-environment">
+        <div class="desktop-icons">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="8" y="12" width="48" height="32" rx="2" fill="#d4d0c8" stroke="#ffffff" stroke-width="1"/>
+                    <rect x="12" y="16" width="40" height="24" fill="#000080"/>
+                    <path d="M 28 44 L 36 44 L 40 52 L 24 52 Z" fill="#d4d0c8" stroke="#ffffff" stroke-width="1"/>
+                    <rect x="20" y="52" width="24" height="4" fill="#a0a0a0"/>
+                </svg>
+                <span>My Computer</span>
+            </div>
+            <div class="icon-wrapper">
+                <img src="https://i.ibb.co/fY5BzSny/internet.png" alt="mogi.exe">
+                <span>mogi.exe</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. The Internet Explorer Pop-Up -->
+    <div class="retro-popup" id="ieWindow">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="https://i.ibb.co/fY5BzSny/internet.png" alt="ie logo">
+                Internet Explorer
+            </div>
+            <div class="title-bar-controls">
+                <div class="control-btn">_</div>
+                <div class="control-btn">□</div>
+                <div class="control-btn close-btn">X</div>
+            </div>
+        </div>
+
+        <div class="ie-toolbar">
+            <span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span>
+        </div>
+        
+        <div class="ie-address-bar">
+            <span>Address</span>
+            <div class="address-input">http://mogi.archive/waitlist</div>
+        </div>
+
+        <div class="window-body" id="appBody">
+            <div class="vhs-overlay"></div>
+            <div class="vhs-noise"></div>
+            <div class="wall-bg"></div>
+            
+            <div class="scene" id="scene">
+                <div class="memo-wrapper" id="memo">
+                    <img src="https://i.ibb.co/CpdTd94k/image.png" class="memo-base-img">
+
+                    <div class="memo">
+                        <div class="spray-overlay" id="sprayOverlay">
+                            <div class="spray-splatter"></div>
+                            <!-- Inserted your new main logo here for the grand spray reveal -->
+                            <img src="https://i.ibb.co/HLZYQZZ7/Create-logo-based-202603211131-Photoroom-1.png" class="mogi-logo">
+                            <img src="https://i.ibb.co/CpBK0wm5/spray-can-Photoroom.png" id="sprayCan" class="spray-can">
+                        </div>
+
+                        <div class="title">MOGI WAITLIST v1.0</div>
+                        <div class="separator">————————————————————————————</div>
+                        <div class="intro">YOU ARE ABOUT TO ENTER THE ARCHIVE.</div>
+                        <div class="body-text">This is not a newsletter. This is not a club.<br>This is a list of names who knew before mogi existed.</div>
+                        <div class="body-text">If you want to be on it, leave your name. Nothing else.</div>
+                        <div class="separator">————————————————————————————</div>
+                        
+                        <form id="archiveForm">
+                            <div class="input-group">
+                                <input type="email" id="emailInput" placeholder="[ ENTER YOUR EMAIL ]" required autocomplete="off">
+                            </div>
+                            <button type="submit" id="submitBtn">[ENTER THE ARCHIVE]</button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="hand-overlay">
+                    <img src="https://i.ibb.co/1tbJ9mmY/diddyhand-Photoroom.png" class="hand-img">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button">
+            <svg viewBox="0 0 24 24"><path d="M0,3.4l10-1.4v9.6H0V3.4z M11,1.8l13-1.8v11.6H11V1.8z M0,12.5h10v9.6L0,20.6V12.5z M11,12.5h13v11.6l-13-1.8V12.5z"/></svg>
+            <i>start</i>
+        </div>
+        <div class="taskbar-tasks">
+            <div class="task-tab" id="taskbarTab">
+                <img src="https://i.ibb.co/fY5BzSny/internet.png" alt="ie icon">
+                <span>Internet Explorer</span>
+            </div>
+        </div>
+        <div class="system-tray">12:00 PM</div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ieWindow = document.getElementById('ieWindow');
+            const appBody = document.getElementById('appBody');
+            const form = document.getElementById('archiveForm');
+            const sprayOverlay = document.getElementById('sprayOverlay');
+            const submitBtn = document.getElementById('submitBtn');
+            const emailInput = document.getElementById('emailInput');
+            const taskbarTab = document.getElementById('taskbarTab');
+
+            // 1. Pop in centered
+            setTimeout(() => {
+                ieWindow.classList.add('pop-in');
+                taskbarTab.classList.add('visible');
+            }, 800);
+
+            // 2. Expand smoothly
+            setTimeout(() => {
+                ieWindow.classList.add('fullscreen');
+            }, 2000);
+
+            // 3. Trigger animations after expansion
+            ieWindow.addEventListener('transitionend', function handler(e) {
+                if ((e.propertyName === 'top' || e.propertyName === 'width') && ieWindow.classList.contains('fullscreen')) {
+                    // Added an 800ms wait time here so background images can securely load before the paper slaps!
+                    setTimeout(() => {
+                        appBody.classList.add('play-anim');
+                    }, 800);
+                    ieWindow.removeEventListener('transitionend', handler);
+                }
+            });
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+                if(emailInput.value.trim() !== '') {
+                    emailInput.disabled = true;
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "[ ARCHIVED. ]";
+                    submitBtn.style.background = "#222";
+                    submitBtn.style.color = "#777";
+                    sprayOverlay.classList.add('spray-active');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
