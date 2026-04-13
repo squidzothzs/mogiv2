@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-    // CORS — same origin only in production
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -13,34 +12,31 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Invalid email' });
     }
 
-    const { AIRTABLE_API_KEY, AIRTABLE_BASE_ID, AIRTABLE_TABLE_NAME } = process.env;
+    const { SUPABASE_URL, SUPABASE_ANON_KEY } = process.env;
 
-    if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !AIRTABLE_TABLE_NAME) {
-        console.error('Missing Airtable env vars');
+    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+        console.error('Missing Supabase env vars');
         return res.status(500).json({ error: 'Server misconfigured' });
     }
 
     try {
-        const response = await fetch(
-            `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_TABLE_NAME)}`,
-            {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    fields: {
-                        Email: email.toLowerCase().trim(),
-                        'Signed Up': new Date().toISOString(),
-                    },
-                }),
-            }
-        );
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
+            method: 'POST',
+            headers: {
+                'apikey': SUPABASE_ANON_KEY,
+                'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                'Content-Type': 'application/json',
+                'Prefer': 'return=minimal',
+            },
+            body: JSON.stringify({
+                email: email.toLowerCase().trim(),
+                created_at: new Date().toISOString(),
+            }),
+        });
 
         if (!response.ok) {
             const err = await response.text();
-            console.error('Airtable error:', err);
+            console.error('Supabase error:', err);
             return res.status(500).json({ error: 'Failed to save' });
         }
 
