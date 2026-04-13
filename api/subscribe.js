@@ -34,6 +34,11 @@ export default async function handler(req, res) {
             }),
         });
 
+        if (response.status === 409) {
+            // Duplicate email — treat as success
+            return res.status(200).json({ success: true });
+        }
+
         if (!response.ok) {
             const err = await response.text();
             console.error('Supabase error:', err);

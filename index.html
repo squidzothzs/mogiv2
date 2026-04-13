@@ -185,24 +185,10 @@
             color: #fdf5c9;
             text-shadow: 0 0 60px rgba(255,160,50,0.25), 0 0 120px rgba(255,80,20,0.1);
         }
-        .cs-mogi-zh {
-            font-family: 'Noto Sans TC', sans-serif;
-            font-size: clamp(0.65rem, 2vw, 0.95rem);
-            color: rgba(255,200,100,0.45); letter-spacing: 0.5em;
-        }
-        .cs-divider {
-            color: rgba(255,200,100,0.25); font-size: 0.7rem; letter-spacing: -2px;
-            overflow: hidden; white-space: nowrap; width: 100%; max-width: 320px; margin: 2px 0;
-        }
         .cs-coming-soon {
             font-family: 'Courier Prime', monospace;
             font-size: clamp(0.75rem, 2.5vw, 1.1rem);
             letter-spacing: 0.55em; color: rgba(253,245,201,0.75);
-        }
-        .cs-sub {
-            font-size: clamp(0.55rem, 1.5vw, 0.75rem);
-            color: rgba(255,170,60,0.35); letter-spacing: 0.35em;
-            font-family: 'Noto Sans TC', sans-serif;
         }
         .cs-blink { animation: blink 1.2s step-end infinite; color: rgba(255,160,50,0.5); }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -499,10 +485,7 @@
                 <div id="holeGlow"></div>
                 <div class="cs-content">
                     <div class="cs-mogi">MOGI</div>
-                    <div class="cs-mogi-zh">摩 奇</div>
-                    <div class="cs-divider">————————————————————————————</div>
                     <div class="cs-coming-soon">COMING SOON<span class="cs-blink">_</span></div>
-                    <div class="cs-sub">SS25 · 九龍</div>
                 </div>
             </div>
 
@@ -712,39 +695,58 @@
                     holeGlow.style.height = '200px';
                     holeGlow.style.opacity = '1';
 
-                    // Apply clip-path and animate hole growing
+                    // Apply clip-path
                     wallLayer.style.clipPath = 'url(#wallHoleClip)';
-                    // Init tiny hole so clip path takes effect immediately
                     holeClipPath.setAttribute('d', buildHolePath(cx, cy, 5, W, H));
 
-                    const maxR    = Math.sqrt(W * W + H * H) * 0.78;
-                    const dur     = 2800;
-                    let   startTs = null;
+                    const peepR   = 110; // peephole radius (px) — pause here
+                    const maxR    = Math.sqrt(W * W + H * H) * 0.82;
 
-                    function animHole(ts) {
+                    // Phase 1: quick punch-in to peephole size (450ms)
+                    const phase1Dur = 450;
+                    let startTs = null;
+
+                    function animPhase1(ts) {
                         if (!startTs) startTs = ts;
-                        const p    = Math.min((ts - startTs) / dur, 1);
-                        const ease = 1 - Math.pow(1 - p, 2.8); // ease-out
-                        const r    = 5 + (maxR - 5) * ease;
-
+                        const p    = Math.min((ts - startTs) / phase1Dur, 1);
+                        const ease = 1 - Math.pow(1 - p, 3);
+                        const r    = 5 + (peepR - 5) * ease;
                         holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
-
-                        // Grow glow with hole
-                        const gs = Math.min(r * 2.5, Math.max(W, H) * 1.2);
+                        const gs = r * 2.8;
                         holeGlow.style.width  = gs + 'px';
                         holeGlow.style.height = gs + 'px';
-
                         if (p < 1) {
-                            requestAnimationFrame(animHole);
+                            requestAnimationFrame(animPhase1);
                         } else {
-                            // Hole fills screen — fade out wall layer
-                            wallLayer.style.transition = 'opacity 0.4s ease-out';
-                            wallLayer.style.opacity = '0';
-                            holeVfx.style.transition = 'opacity 0.4s ease-out';
-                            holeVfx.style.opacity = '0';
+                            // Hold peephole for 1600ms, then expand
+                            setTimeout(startPhase2, 1600);
                         }
                     }
-                    requestAnimationFrame(animHole);
+                    requestAnimationFrame(animPhase1);
+
+                    function startPhase2() {
+                        const phase2Dur = 2200;
+                        let ts2 = null;
+                        function animPhase2(ts) {
+                            if (!ts2) ts2 = ts;
+                            const p    = Math.min((ts - ts2) / phase2Dur, 1);
+                            const ease = 1 - Math.pow(1 - p, 2.5);
+                            const r    = peepR + (maxR - peepR) * ease;
+                            holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
+                            const gs = Math.min(r * 2.5, Math.max(W, H) * 1.2);
+                            holeGlow.style.width  = gs + 'px';
+                            holeGlow.style.height = gs + 'px';
+                            if (p < 1) {
+                                requestAnimationFrame(animPhase2);
+                            } else {
+                                wallLayer.style.transition = 'opacity 0.4s ease-out';
+                                wallLayer.style.opacity = '0';
+                                holeVfx.style.transition = 'opacity 0.4s ease-out';
+                                holeVfx.style.opacity = '0';
+                            }
+                        }
+                        requestAnimationFrame(animPhase2);
+                    }
 
                 }, 290);
             }
