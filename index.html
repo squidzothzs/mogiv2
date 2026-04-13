@@ -321,12 +321,14 @@
            ========================================= */
         #punchFist {
             position: absolute;
-            font-size: clamp(90px, 16vw, 150px);
+            width: clamp(180px, 32vw, 300px);
+            height: clamp(180px, 32vw, 300px);
             z-index: 200; opacity: 0; pointer-events: none;
             transform: translate(-50%, -50%);
             filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95));
-            line-height: 1; will-change: transform, opacity;
+            will-change: transform, opacity;
         }
+        #punchFist img { width: 100%; height: 100%; object-fit: contain; }
         #punchFist.punch-active {
             animation: fistPunch 0.9s cubic-bezier(0.15, 0, 0.25, 1) forwards;
         }
@@ -357,18 +359,6 @@
             z-index: 180; pointer-events: none; opacity:0;
         }
         #holeVfx.active { opacity:1; }
-        #crackSvg {
-            position: absolute; top:0; left:0; width:100%; height:100%;
-            overflow: visible;
-        }
-        .crack-line {
-            stroke: rgba(200,155,80,0.75);
-            stroke-width: 1.5; fill: none;
-            stroke-linecap: round; stroke-linejoin: round;
-            stroke-dasharray: 400; stroke-dashoffset: 400;
-            animation: crackDraw 0.25s ease-out forwards;
-        }
-        @keyframes crackDraw { to { stroke-dashoffset: 0; } }
         .dust-particle {
             position: absolute; border-radius: 50%;
             background: rgba(210,165,85,0.9);
@@ -410,7 +400,7 @@
             .mogi-logo { max-width: 340px; }
             .hand-overlay { width: 260px; height: 260px; margin-top: -130px; margin-left: -130px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
-            #punchFist { font-size: clamp(70px, 20vw, 110px); }
+            #punchFist { width: clamp(140px, 45vw, 220px); height: clamp(140px, 45vw, 220px); }
         }
         @keyframes mobileHandSlap {
             0%   { transform:scale(1.5) translateY(800px); opacity:0; }
@@ -469,15 +459,6 @@
 
         <div class="window-body" id="appBody">
 
-            <!-- SVG clip-path def for wall hole -->
-            <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-                <defs>
-                    <clipPath id="wallHoleClip">
-                        <path id="holeClipPath" clip-rule="evenodd" fill-rule="evenodd" d=""/>
-                    </clipPath>
-                </defs>
-            </svg>
-
             <!-- Scene 2: Coming Soon (sits behind wall) -->
             <div id="comingSoonScene">
                 <div class="cs-vhs-overlay"></div>
@@ -531,14 +512,13 @@
                 </div>
             </div>
 
-            <!-- Hole VFX: cracks + dust (above wall, below fist) -->
+            <!-- Dust VFX (above wall, below fist) -->
             <div id="holeVfx">
-                <svg id="crackSvg"></svg>
                 <div id="dustContainer"></div>
             </div>
 
             <!-- Punch fist (topmost) -->
-            <div id="punchFist">✊</div>
+            <div id="punchFist"><img src="assets/fist.png" alt="fist"></div>
 
         </div>
     </div>
@@ -575,7 +555,6 @@
             const punchFist    = document.getElementById('punchFist');
             const holeVfx      = document.getElementById('holeVfx');
             const holeGlow     = document.getElementById('holeGlow');
-            const holeClipPath = document.getElementById('holeClipPath');
 
             // ── Live HKT clock ──────────────────────────────
             function updateClock() {
@@ -603,24 +582,19 @@
                 }
             });
 
-            // ── Hole path builder ───────────────────────────
-            // Pre-generate jagged profile (fixed so hole shape is consistent)
-            const N_PTS = 28;
-            const jagProfile = Array.from({ length: N_PTS }, (_, i) => {
-                // Deterministic jag using sine to avoid Math.random between frames
-                return 0.72 + 0.52 * Math.abs(Math.sin(i * 2.3 + 0.7));
-            });
-
-            function buildHolePath(cx, cy, r, W, H) {
-                const outer = `M0,0 L${W},0 L${W},${H} L0,${H} Z`;
-                if (r <= 0) return outer;
-                const pts = jagProfile.map((jag, i) => {
-                    const angle = (i / N_PTS) * Math.PI * 2;
-                    const rx = (cx + Math.cos(angle) * r * jag).toFixed(2);
-                    const ry = (cy + Math.sin(angle) * r * jag).toFixed(2);
-                    return `${rx},${ry}`;
-                });
-                return `${outer} M${pts.join(' L')} Z`;
+            // ── Hole mask helper ────────────────────────────
+            function applyHoleMask(size) {
+                const s = `${size}px ${size}px`;
+                wallLayer.style.webkitMaskImage = "url('assets/paperhole.png')";
+                wallLayer.style.maskImage       = "url('assets/paperhole.png')";
+                wallLayer.style.webkitMaskMode  = 'luminance';
+                wallLayer.style.maskMode        = 'luminance';
+                wallLayer.style.webkitMaskRepeat = 'no-repeat';
+                wallLayer.style.maskRepeat       = 'no-repeat';
+                wallLayer.style.webkitMaskPosition = 'center center';
+                wallLayer.style.maskPosition       = 'center center';
+                wallLayer.style.webkitMaskSize  = s;
+                wallLayer.style.maskSize        = s;
             }
 
             // ── Dust particles ──────────────────────────────
@@ -645,26 +619,6 @@
                 }
             }
 
-            // ── Crack lines ─────────────────────────────────
-            function spawnCracks(cx, cy) {
-                const svg = document.getElementById('crackSvg');
-                const NUM = 10;
-                for (let i = 0; i < NUM; i++) {
-                    const baseAngle = (i / NUM) * Math.PI * 2 + (Math.sin(i * 1.7) * 0.4);
-                    const len = 55 + Math.abs(Math.sin(i * 2.1)) * 130;
-                    // Two-segment jagged crack
-                    const mx = cx + Math.cos(baseAngle) * len * 0.45 + (Math.sin(i * 3.1) * 18);
-                    const my = cy + Math.sin(baseAngle) * len * 0.45 + (Math.cos(i * 2.7) * 18);
-                    const ex = cx + Math.cos(baseAngle) * len;
-                    const ey = cy + Math.sin(baseAngle) * len;
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-                    line.setAttribute('points', `${cx},${cy} ${mx.toFixed(1)},${my.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`);
-                    line.setAttribute('class', 'crack-line');
-                    line.style.animationDelay = `${i * 0.02}s`;
-                    svg.appendChild(line);
-                }
-            }
-
             // ── Main punch sequence ─────────────────────────
             function triggerPunchSequence() {
                 const W  = appBody.offsetWidth;
@@ -683,26 +637,21 @@
                     wallLayer.classList.add('shake');
                     setTimeout(() => wallLayer.classList.remove('shake'), 420);
 
-                    // VFX
+                    // Dust VFX
                     spawnDust(cx, cy);
-                    spawnCracks(cx, cy);
                     holeVfx.classList.add('active');
 
-                    // Glow through hole
-                    holeGlow.style.left   = cx + 'px';
-                    holeGlow.style.top    = cy + 'px';
-                    holeGlow.style.width  = '200px';
-                    holeGlow.style.height = '200px';
+                    // Glow behind hole
+                    holeGlow.style.width   = '160px';
+                    holeGlow.style.height  = '160px';
                     holeGlow.style.opacity = '1';
 
-                    // Apply clip-path
-                    wallLayer.style.clipPath = 'url(#wallHoleClip)';
-                    holeClipPath.setAttribute('d', buildHolePath(cx, cy, 5, W, H));
+                    // Peephole size: mask-size where black center ≈ 60% of PNG width
+                    // so peephole visible radius ≈ peepSize * 0.30
+                    const peepSize = 280;  // px — gives ~84px visible radius
+                    const maxSize  = Math.sqrt(W * W + H * H) * 3; // covers full screen
 
-                    const peepR   = 110; // peephole radius (px) — pause here
-                    const maxR    = Math.sqrt(W * W + H * H) * 0.82;
-
-                    // Phase 1: quick punch-in to peephole size (450ms)
+                    // Phase 1: quick punch-in to peephole (450ms)
                     const phase1Dur = 450;
                     let startTs = null;
 
@@ -710,15 +659,13 @@
                         if (!startTs) startTs = ts;
                         const p    = Math.min((ts - startTs) / phase1Dur, 1);
                         const ease = 1 - Math.pow(1 - p, 3);
-                        const r    = 5 + (peepR - 5) * ease;
-                        holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
-                        const gs = r * 2.8;
-                        holeGlow.style.width  = gs + 'px';
-                        holeGlow.style.height = gs + 'px';
+                        const s    = 10 + (peepSize - 10) * ease;
+                        applyHoleMask(s);
+                        holeGlow.style.width  = (s * 0.7) + 'px';
+                        holeGlow.style.height = (s * 0.7) + 'px';
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Hold peephole for 1600ms, then expand
                             setTimeout(startPhase2, 1600);
                         }
                     }
@@ -731,17 +678,17 @@
                             if (!ts2) ts2 = ts;
                             const p    = Math.min((ts - ts2) / phase2Dur, 1);
                             const ease = 1 - Math.pow(1 - p, 2.5);
-                            const r    = peepR + (maxR - peepR) * ease;
-                            holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
-                            const gs = Math.min(r * 2.5, Math.max(W, H) * 1.2);
+                            const s    = peepSize + (maxSize - peepSize) * ease;
+                            applyHoleMask(s);
+                            const gs = Math.min(s * 0.6, Math.max(W, H) * 1.2);
                             holeGlow.style.width  = gs + 'px';
                             holeGlow.style.height = gs + 'px';
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
                             } else {
-                                wallLayer.style.transition = 'opacity 0.4s ease-out';
+                                wallLayer.style.transition = 'opacity 0.5s ease-out';
                                 wallLayer.style.opacity = '0';
-                                holeVfx.style.transition = 'opacity 0.4s ease-out';
+                                holeVfx.style.transition = 'opacity 0.5s ease-out';
                                 holeVfx.style.opacity = '0';
                             }
                         }
