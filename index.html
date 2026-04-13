@@ -8,9 +8,6 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Noto+Sans+TC:wght@400;700&display=swap');
 
-        /* =========================================
-           GLOBAL RESETS
-           ========================================= */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body, html {
             height: 100%; width: 100%;
@@ -26,27 +23,21 @@
         .desktop-environment {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('assets/desktop-bg.jpg');
-            background-size: cover;
-            background-position: center;
-            /* Warm amber tint to evoke old CRT monitor glow */
+            background-size: cover; background-position: center;
             filter: sepia(0.4) saturate(0.7) brightness(0.7);
             z-index: 1;
         }
-
-        /* Dark overlay for depth */
         .desktop-environment::after {
             content: '';
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
         }
-
         .desktop-icons { display: flex; flex-direction: column; gap: 20px; padding: 15px; position: relative; z-index: 2; }
         .icon-wrapper { display: flex; flex-direction: column; align-items: center; width: 65px; text-align: center; cursor: pointer; }
         .icon-wrapper img, .icon-wrapper svg { width: 34px; height: 34px; margin-bottom: 4px; filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.7)); }
         .icon-wrapper span { color: white; font-size: 11px; text-shadow: 1px 1px 3px black, -1px -1px 3px black; font-family: 'Tahoma', sans-serif; word-wrap: break-word; }
         .icon-wrapper .zh { font-family: 'Noto Sans TC', sans-serif; font-size: 10px; color: rgba(255,220,150,0.9); }
 
-        /* Taskbar — keeping XP style but with warmer tones */
         .taskbar {
             position: fixed; bottom: 0; left: 0; width: 100%; height: 30px;
             background: linear-gradient(to bottom, #1a3a6e 0%, #2e5fa8 9%, #1a3a6e 18%, #1a3a6e 92%, #0f2550 100%);
@@ -65,11 +56,11 @@
         }
         .start-button svg { width: 16px; height: 16px; fill: #ffd580; }
         .system-tray {
-            height: 100%; padding: 0 12px; color: #ffd580; font-size: 11px; display: flex; align-items: center; gap: 8px;
+            height: 100%; padding: 0 12px; color: #ffd580; font-size: 11px;
+            display: flex; align-items: center; gap: 8px;
             background: linear-gradient(to bottom, #0f2a5a 0%, #0a1e42 100%);
             border-left: 1px solid rgba(255,180,50,0.2);
-            font-family: 'Courier Prime', monospace;
-            white-space: nowrap;
+            font-family: 'Courier Prime', monospace; white-space: nowrap;
         }
         .tray-city { font-size: 9px; color: rgba(255,180,50,0.6); font-family: 'Noto Sans TC', sans-serif; }
         .taskbar-tasks { flex-grow: 1; display: flex; align-items: center; padding: 0 10px; height: 100%; }
@@ -85,18 +76,13 @@
         .task-tab img { width: 14px; height: 14px; }
 
         /* =========================================
-           IE POPUP — HK CYBERCAFÉ STYLE
+           IE POPUP
            ========================================= */
         .retro-popup {
-            position: fixed;
-            top: 50%; left: 50%;
-            width: min(90vw, 600px);
-            height: min(60vh, 450px);
-            transform: translate(-50%, -50%) scale(0);
-            opacity: 0;
-            background: #d4cebb;
-            border: 3px solid #1a3a6e;
-            border-radius: 8px 8px 0 0;
+            position: fixed; top: 50%; left: 50%;
+            width: min(90vw, 600px); height: min(60vh, 450px);
+            transform: translate(-50%, -50%) scale(0); opacity: 0;
+            background: #d4cebb; border: 3px solid #1a3a6e; border-radius: 8px 8px 0 0;
             box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,180,50,0.1);
             display: flex; flex-direction: column;
             z-index: 1000; overflow: hidden;
@@ -107,14 +93,10 @@
         .retro-popup.pop-in { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .retro-popup.fullscreen {
             top: 0 !important; left: 0 !important;
-            width: 100% !important;
-            height: calc(100% - 30px) !important;
+            width: 100% !important; height: calc(100% - 30px) !important;
             transform: translate(0, 0) scale(1) !important;
-            border-width: 0px; border-radius: 0px;
-            opacity: 1;
+            border-width: 0px; border-radius: 0px; opacity: 1;
         }
-
-        /* Title bar — slightly warmer blue */
         .title-bar {
             background: linear-gradient(to right, #1a3a6e 0%, #2e6ab8 60%, #1a4a8e 100%);
             padding: 4px 6px;
@@ -137,7 +119,6 @@
             font-size: 12px; font-weight: bold;
         }
         .close-btn { background: linear-gradient(to bottom, #eab1a6, #d9533a); color: white; border-color: #f7a496; }
-
         .ie-toolbar {
             background: #d4cebb; padding: 3px 8px; display: flex; gap: 12px;
             font-size: 11px; color: #000; border-bottom: 1px solid #b8b09a;
@@ -154,32 +135,99 @@
         }
 
         /* =========================================
-           WEBSITE CONTENT — HK VINTAGE DARK
+           WINDOW BODY
            ========================================= */
         .window-body {
             flex-grow: 1; position: relative; width: 100%; height: 100%;
-            overflow: hidden;
-            font-family: 'Courier Prime', monospace;
-            cursor: crosshair;
+            overflow: hidden; font-family: 'Courier Prime', monospace; cursor: crosshair;
         }
 
-        /* CRT scanlines — slightly stronger, red-tinted */
-        .vhs-overlay {
+        /* =========================================
+           COMING SOON SCENE (behind wall)
+           ========================================= */
+        #comingSoonScene {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%),
-                        linear-gradient(90deg, rgba(255, 0, 0, 0.04), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.04));
+            z-index: 0;
+            background: radial-gradient(ellipse at center, #150a03 0%, #060302 100%);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+        .cs-vhs-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.3) 50%),
+                        linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.01), rgba(0,0,255,0.04));
             background-size: 100% 3px, 4px 100%;
             z-index: 2; pointer-events: none; opacity: 0.8;
         }
+        .cs-vhs-noise {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+            z-index: 3; pointer-events: none; mix-blend-mode: overlay;
+        }
+        /* Warm amber glow that bleeds through the hole */
+        #holeGlow {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,140,30,0.3) 0%, rgba(255,60,10,0.12) 40%, transparent 70%);
+            transform: translate(-50%, -50%);
+            pointer-events: none; z-index: 4;
+            width: 0; height: 0; opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .cs-content {
+            position: relative; z-index: 10;
+            text-align: center; color: #fdf5c9;
+            display: flex; flex-direction: column; align-items: center; gap: 10px;
+        }
+        .cs-mogi {
+            font-family: 'Courier Prime', monospace;
+            font-size: clamp(3.5rem, 13vw, 9rem);
+            font-weight: 700; letter-spacing: 0.3em;
+            color: #fdf5c9;
+            text-shadow: 0 0 60px rgba(255,160,50,0.25), 0 0 120px rgba(255,80,20,0.1);
+        }
+        .cs-mogi-zh {
+            font-family: 'Noto Sans TC', sans-serif;
+            font-size: clamp(0.65rem, 2vw, 0.95rem);
+            color: rgba(255,200,100,0.45); letter-spacing: 0.5em;
+        }
+        .cs-divider {
+            color: rgba(255,200,100,0.25); font-size: 0.7rem; letter-spacing: -2px;
+            overflow: hidden; white-space: nowrap; width: 100%; max-width: 320px; margin: 2px 0;
+        }
+        .cs-coming-soon {
+            font-family: 'Courier Prime', monospace;
+            font-size: clamp(0.75rem, 2.5vw, 1.1rem);
+            letter-spacing: 0.55em; color: rgba(253,245,201,0.75);
+        }
+        .cs-sub {
+            font-size: clamp(0.55rem, 1.5vw, 0.75rem);
+            color: rgba(255,170,60,0.35); letter-spacing: 0.35em;
+            font-family: 'Noto Sans TC', sans-serif;
+        }
+        .cs-blink { animation: blink 1.2s step-end infinite; color: rgba(255,160,50,0.5); }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-        /* Film grain */
+        /* =========================================
+           WALL LAYER (wraps visible scene — receives clip-path)
+           ========================================= */
+        #wallLayer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 10;
+        }
+
+        /* Shared VHS / wall styles */
+        .vhs-overlay {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.3) 50%),
+                        linear-gradient(90deg, rgba(255,0,0,0.04), rgba(0,255,0,0.01), rgba(0,0,255,0.04));
+            background-size: 100% 3px, 4px 100%;
+            z-index: 2; pointer-events: none; opacity: 0.8;
+        }
         .vhs-noise {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
             z-index: 3; pointer-events: none; mix-blend-mode: overlay;
         }
-
-        /* Wall — original HK alley photo */
         .wall-bg {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #1a1a1a;
@@ -188,11 +236,7 @@
             opacity: 1; z-index: 1;
             filter: sepia(0.4) contrast(1.15) saturate(0.75) hue-rotate(-8deg);
         }
-
-        /* Neon glow strips — evoke HK neon signage */
-        .neon-strip {
-            position: absolute; pointer-events: none; z-index: 4;
-        }
+        .neon-strip { position: absolute; pointer-events: none; z-index: 4; }
         .neon-strip.top {
             top: 0; left: 0; right: 0; height: 2px;
             background: linear-gradient(to right, transparent 0%, rgba(255,80,30,0.6) 20%, rgba(255,160,20,0.8) 50%, rgba(255,80,30,0.6) 80%, transparent 100%);
@@ -202,138 +246,157 @@
             bottom: 0; left: 0; right: 0; height: 1px;
             background: linear-gradient(to right, transparent 0%, rgba(200,60,20,0.4) 50%, transparent 100%);
         }
-
-        .scene {
-            position: relative; width: 100%; height: 100%;
-            z-index: 10; display: flex; justify-content: center; align-items: center;
-        }
-
-        /* Ghost brand mark — low opacity logo visible before interaction */
         .brand-ghost {
             position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
             z-index: 5; pointer-events: none;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
-        .brand-ghost img {
-            width: 80px; opacity: 0.18;
-            filter: grayscale(1) brightness(2);
-        }
-        .brand-ghost .brand-tagline {
-            font-family: 'Courier Prime', monospace;
-            font-size: 9px; color: rgba(255,180,80,0.3);
-            letter-spacing: 3px; text-transform: uppercase;
-        }
+        .brand-ghost img { width: 80px; opacity: 0.18; filter: grayscale(1) brightness(2); }
+        .brand-ghost .brand-tagline { font-family: 'Courier Prime', monospace; font-size: 9px; color: rgba(255,180,80,0.3); letter-spacing: 3px; text-transform: uppercase; }
 
-        /* Memo */
+        /* =========================================
+           MEMO & SCENE
+           ========================================= */
+        .scene { position: relative; width: 100%; height: 100%; z-index: 10; display: flex; justify-content: center; align-items: center; }
         .memo-wrapper {
             position: absolute; width: 100%; max-width: 1155px; aspect-ratio: 2063 / 1160;
             opacity: 0; transform: scale(2) translateY(100vh) rotate(15deg);
         }
-        .play-anim .memo-wrapper {
-            animation: memoSlap 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            animation-delay: 0.2s;
-        }
+        .play-anim .memo-wrapper { animation: memoSlap 0.4s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; }
         @keyframes memoSlap {
             0%   { transform: scale(2) translateY(100vh) rotate(15deg); opacity: 0; }
             50%  { transform: scale(0.95) translateY(0) rotate(-4deg); opacity: 1; }
             75%  { transform: scale(1.02) translateY(0) rotate(-1deg); opacity: 1; }
             100% { transform: scale(1) translateY(0) rotate(-2deg); opacity: 1; }
         }
-
         .memo-base-img {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
             filter: sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg) drop-shadow(0px 20px 40px rgba(0,0,0,0.9));
             z-index: 1; pointer-events: none;
         }
-
         .memo {
             position: absolute; top: 24%; bottom: 20%; left: 28%; right: 28%;
             z-index: 10; display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             color: #1a1008; text-align: center; overflow: visible;
         }
-
         .separator { letter-spacing: -2px; overflow: hidden; white-space: nowrap; margin: 6px 0; color: rgba(26,16,8,0.5); font-weight: bold; width: 100%; font-size: 0.8rem; }
         .title { font-weight: bold; font-size: 1.05rem; margin-bottom: 1px; letter-spacing: 1px; }
         .title-zh { font-family: 'Noto Sans TC', sans-serif; font-size: 0.7rem; color: rgba(26,16,8,0.6); margin-bottom: 6px; letter-spacing: 2px; }
         .intro { font-weight: bold; margin-bottom: 6px; font-size: 0.85rem; }
         .body-text { font-size: 0.75rem; line-height: 1.45; margin-bottom: 6px; }
         .body-text-zh { font-family: 'Noto Sans TC', sans-serif; font-size: 0.65rem; color: rgba(26,16,8,0.55); margin-bottom: 8px; font-style: italic; }
-
-        form { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; justify-content: center; }
+        form { display: flex; flex-direction: column; gap: 8px; width: 100%; align-items: center; }
         .input-group { border: 2px solid rgba(15,10,5,0.85); padding: 4px; width: 100%; max-width: 280px; }
-        input[type="email"] {
-            width: 100%; background: transparent; border: none;
-            font-family: 'Courier Prime', monospace; font-size: 0.8rem;
-            color: #1a1008; outline: none; text-align: center; font-weight: bold;
-            /* Prevent iOS auto-zoom */
-            font-size: 16px;
-        }
-        button {
-            background: #1a1008; color: #fdf5c9; border: none; padding: 10px;
-            font-family: 'Courier Prime', monospace; font-weight: bold; font-size: 0.8rem;
-            cursor: pointer; text-transform: uppercase; width: 100%; max-width: 280px;
-            box-shadow: 2px 2px 0px rgba(0,0,0,0.5);
-            transition: background 0.2s, color 0.2s;
-            min-height: 44px;
-        }
+        input[type="email"] { width: 100%; background: transparent; border: none; font-family: 'Courier Prime', monospace; font-size: 16px; color: #1a1008; outline: none; text-align: center; font-weight: bold; }
+        button { background: #1a1008; color: #fdf5c9; border: none; padding: 10px; font-family: 'Courier Prime', monospace; font-weight: bold; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; width: 100%; max-width: 280px; box-shadow: 2px 2px 0px rgba(0,0,0,0.5); transition: background 0.2s; min-height: 44px; }
         button:hover:not(:disabled) { background: #2d1e08; }
         button:disabled { cursor: default; }
+        .form-error { font-size: 0.65rem; color: #8b2000; font-family: 'Courier Prime', monospace; display: none; text-align: center; }
+        .form-error.visible { display: block; }
 
-        /* Loading state */
-        button.loading { color: rgba(253,245,201,0.5); }
-
-        /* =========================================
-           SPRAY / LOGO REVEAL
-           ========================================= */
+        /* Spray animations */
         .spray-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 60; }
         .mogi-logo { width: 100%; max-width: 650px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
-
         .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
         .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
         .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
-
         @keyframes sprayCanAnim {
-            0%   { opacity: 0; transform: translate(300px, -200px) rotate(-20deg); }
-            10%  { opacity: 1; transform: translate(150px, -150px) rotate(-15deg); }
-            20%  { transform: translate(-200px, -100px) rotate(-10deg); }
-            30%  { transform: translate(200px, -50px) rotate(-15deg); }
-            40%  { transform: translate(-150px, 20px) rotate(-10deg); }
-            50%  { transform: translate(150px, 100px) rotate(-15deg); }
-            60%  { transform: translate(-100px, 350px) rotate(-5deg); }
-            75%  { transform: translate(150px, 400px) rotate(-10deg); }
-            90%  { opacity: 1; transform: translate(300px, 600px) rotate(10deg); }
-            100% { opacity: 0; transform: translate(450px, 700px) rotate(20deg); }
+            0%   { opacity:0; transform:translate(300px,-200px) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(150px,-150px) rotate(-15deg); }
+            20%  { transform:translate(-200px,-100px) rotate(-10deg); }
+            30%  { transform:translate(200px,-50px) rotate(-15deg); }
+            40%  { transform:translate(-150px,20px) rotate(-10deg); }
+            50%  { transform:translate(150px,100px) rotate(-15deg); }
+            60%  { transform:translate(-100px,350px) rotate(-5deg); }
+            75%  { transform:translate(150px,400px) rotate(-10deg); }
+            90%  { opacity:1; transform:translate(300px,600px) rotate(10deg); }
+            100% { opacity:0; transform:translate(450px,700px) rotate(20deg); }
         }
-        @keyframes spraySplatterAnim { 0% { opacity: 0; transform: scale(0.8); } 20% { opacity: 1; transform: scale(1); } 100% { opacity: 0; } }
-        @keyframes fadeInProgressive { from { opacity: 0; filter: blur(15px); } to { opacity: 0.95; filter: blur(0.5px); } }
+        @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
+        @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
 
-        /* Hand animation */
-        .hand-overlay { position: absolute; top: 50%; left: 50%; width: 600px; height: 600px; margin-top: -300px; margin-left: -300px; pointer-events: none; z-index: 50; opacity: 0; transform: scale(2) translateY(150%); }
-        .play-anim .hand-overlay {
-            animation: handSlapAnim 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-            animation-delay: 0.2s;
-        }
+        /* Hand */
+        .hand-overlay { position: absolute; top:50%; left:50%; width:600px; height:600px; margin-top:-300px; margin-left:-300px; pointer-events:none; z-index:50; opacity:0; transform:scale(2) translateY(150%); }
+        .play-anim .hand-overlay { animation: handSlapAnim 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay:0.2s; }
         @keyframes handSlapAnim {
-            0%   { transform: scale(1.5) translateY(150%); opacity: 0; }
-            12%  { transform: scale(1.2) translateY(50%); opacity: 1; }
-            25%  { transform: scale(1) translateY(0) rotate(-10deg); opacity: 1; }
-            55%  { transform: scale(1) translateY(0) rotate(-10deg); opacity: 1; }
-            100% { transform: scale(0.9) translateY(150%); opacity: 0; }
+            0%   { transform:scale(1.5) translateY(150%); opacity:0; }
+            12%  { transform:scale(1.2) translateY(50%); opacity:1; }
+            25%  { transform:scale(1) translateY(0) rotate(-10deg); opacity:1; }
+            55%  { transform:scale(1) translateY(0) rotate(-10deg); opacity:1; }
+            100% { transform:scale(0.9) translateY(150%); opacity:0; }
         }
-        .hand-img { width: 100%; height: 100%; object-fit: contain; filter: sepia(0.4) brightness(0.8) contrast(1.2) drop-shadow(0px 20px 40px rgba(0,0,0,0.9)); }
-
-        /* Error message */
-        .form-error {
-            font-size: 0.65rem; color: #8b2000; font-family: 'Courier Prime', monospace;
-            display: none; text-align: center;
-        }
-        .form-error.visible { display: block; }
+        .hand-img { width:100%; height:100%; object-fit:contain; filter:sepia(0.4) brightness(0.8) contrast(1.2) drop-shadow(0px 20px 40px rgba(0,0,0,0.9)); }
 
         /* =========================================
-           MOBILE OPTIMIZATION
+           PUNCH FIST
+           ========================================= */
+        #punchFist {
+            position: absolute;
+            font-size: clamp(90px, 16vw, 150px);
+            z-index: 200; opacity: 0; pointer-events: none;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95));
+            line-height: 1; will-change: transform, opacity;
+        }
+        #punchFist.punch-active {
+            animation: fistPunch 0.9s cubic-bezier(0.15, 0, 0.25, 1) forwards;
+        }
+        @keyframes fistPunch {
+            0%   { opacity:0; transform:translate(-50%, calc(-50% - 280px)) scale(1.5); }
+            12%  { opacity:1; transform:translate(-50%, calc(-50% - 100px)) scale(1.25); }
+            32%  { opacity:1; transform:translate(-50%, -50%) scale(1.0); }
+            55%  { opacity:1; transform:translate(-50%, calc(-50% + 8px)) scale(0.97); }
+            100% { opacity:0; transform:translate(-50%, calc(-50% - 380px)) scale(0.85); }
+        }
+
+        /* Screen shake applied to wallLayer */
+        .shake { animation: screenShake 0.38s ease-out; }
+        @keyframes screenShake {
+            0%,100% { transform:translate(0,0) rotate(0); }
+            15% { transform:translate(-7px,4px) rotate(-0.4deg); }
+            30% { transform:translate(7px,-5px) rotate(0.4deg); }
+            45% { transform:translate(-5px,7px) rotate(-0.3deg); }
+            60% { transform:translate(5px,-3px) rotate(0.3deg); }
+            78% { transform:translate(-2px,2px); }
+        }
+
+        /* =========================================
+           HOLE VFX (cracks + dust)
+           ========================================= */
+        #holeVfx {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            z-index: 180; pointer-events: none; opacity:0;
+        }
+        #holeVfx.active { opacity:1; }
+        #crackSvg {
+            position: absolute; top:0; left:0; width:100%; height:100%;
+            overflow: visible;
+        }
+        .crack-line {
+            stroke: rgba(200,155,80,0.75);
+            stroke-width: 1.5; fill: none;
+            stroke-linecap: round; stroke-linejoin: round;
+            stroke-dasharray: 400; stroke-dashoffset: 400;
+            animation: crackDraw 0.25s ease-out forwards;
+        }
+        @keyframes crackDraw { to { stroke-dashoffset: 0; } }
+        .dust-particle {
+            position: absolute; border-radius: 50%;
+            background: rgba(210,165,85,0.9);
+            transform: translate(-50%, -50%);
+            animation: dustFly var(--dur) ease-out var(--delay) forwards;
+        }
+        @keyframes dustFly {
+            0%   { transform:translate(-50%,-50%) scale(1); opacity:1; }
+            70%  { opacity:0.5; }
+            100% { transform:translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(0); opacity:0; }
+        }
+
+        /* =========================================
+           MOBILE
            ========================================= */
         @media (max-width: 600px) {
             .start-button { font-size: 12px; padding: 0 8px 0 5px; }
@@ -341,81 +404,51 @@
             .system-tray { font-size: 10px; padding: 0 8px; gap: 4px; }
             .tray-city { display: none; }
             .task-tab { width: auto; flex-grow: 1; max-width: 130px; }
-            .task-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-            .desktop-icons { padding: 10px; }
-            .icon-wrapper { width: 60px; }
-
             .ie-toolbar span:not(:first-child):not(:nth-child(2)) { display: none; }
             .ie-toolbar { gap: 8px; font-size: 10px; }
             .address-input { font-size: 10px; padding: 2px 4px; }
-
             .memo-wrapper { width: 160%; flex-shrink: 0; }
-            .play-anim .memo-wrapper {
-                animation: memoSlap 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-                animation-delay: 0.2s;
-            }
             .memo { top: 24%; bottom: 20%; left: 26%; right: 26%; }
-
-            /* Mobile typography — minimum 12px */
-            .title { font-size: 0.875rem; margin-bottom: 1px; }
+            .title { font-size: 0.875rem; }
             .title-zh { font-size: 0.6rem; margin-bottom: 4px; }
             .intro { font-size: 0.75rem; margin-bottom: 4px; }
             .body-text { font-size: 0.7rem; line-height: 1.3; margin-bottom: 3px; }
             .body-text-zh { font-size: 0.6rem; margin-bottom: 5px; }
             .separator { margin: 3px 0; font-size: 0.6rem; letter-spacing: -1.5px; }
-
             form { gap: 5px; width: 82%; }
             .input-group { padding: 3px; border-width: 1.5px; width: 100%; max-width: 100%; }
-            input[type="email"] { font-size: 16px; padding: 2px; }
             button { padding: 8px 4px; font-size: 0.7rem; width: 100%; max-width: 100%; min-height: 40px; }
-
             .brand-ghost img { width: 55px; }
-            .brand-ghost .brand-tagline { font-size: 7px; letter-spacing: 2px; }
-
+            .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 100px; }
             .mogi-logo { max-width: 340px; }
-
             .hand-overlay { width: 260px; height: 260px; margin-top: -130px; margin-left: -130px; }
-            .play-anim .hand-overlay {
-                animation: mobileHandSlap 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-                animation-delay: 0.2s;
-                will-change: transform;
-            }
+            .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
+            #punchFist { font-size: clamp(70px, 20vw, 110px); }
         }
-
         @keyframes mobileHandSlap {
-            0%   { transform: scale(1.5) translateY(800px); opacity: 0; }
-            12%  { transform: scale(1.2) translateY(300px); opacity: 1; }
-            25%  { transform: scale(0.9) translateY(0) rotate(-10deg); opacity: 1; }
-            55%  { transform: scale(0.9) translateY(0) rotate(-10deg); opacity: 1; }
-            100% { transform: scale(0.8) translateY(800px); opacity: 0; }
+            0%   { transform:scale(1.5) translateY(800px); opacity:0; }
+            12%  { transform:scale(1.2) translateY(300px); opacity:1; }
+            25%  { transform:scale(0.9) translateY(0) rotate(-10deg); opacity:1; }
+            55%  { transform:scale(0.9) translateY(0) rotate(-10deg); opacity:1; }
+            100% { transform:scale(0.8) translateY(800px); opacity:0; }
         }
-
         @media (max-width: 380px) {
             .memo-wrapper { width: 185%; }
             .title { font-size: 0.8rem; }
             .intro { font-size: 0.7rem; }
             .body-text { font-size: 0.65rem; }
-            .body-text-zh { font-size: 0.55rem; }
-            .separator { font-size: 0.55rem; }
-            input[type="email"] { font-size: 16px; }
             button { font-size: 0.65rem; min-height: 38px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 1. HK Cybercafé Desktop -->
+    <!-- Desktop -->
     <div class="desktop-environment">
         <div class="desktop-icons">
             <div class="icon-wrapper">
-                <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
-                    <rect x="8" y="12" width="48" height="32" rx="2" fill="#d4d0c8" stroke="#ffffff" stroke-width="1"/>
-                    <rect x="12" y="16" width="40" height="24" fill="#000080"/>
-                    <path d="M 28 44 L 36 44 L 40 52 L 24 52 Z" fill="#d4d0c8" stroke="#ffffff" stroke-width="1"/>
-                    <rect x="20" y="52" width="24" height="4" fill="#a0a0a0"/>
-                </svg>
+                <svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="32" rx="2" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="12" y="16" width="40" height="24" fill="#000080"/><path d="M28 44 L36 44 L40 52 L24 52 Z" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="20" y="52" width="24" height="4" fill="#a0a0a0"/></svg>
                 <span>My Computer</span>
             </div>
             <div class="icon-wrapper">
@@ -426,7 +459,7 @@
         </div>
     </div>
 
-    <!-- 2. Internet Explorer Pop-Up — HK Cybercafé Edition -->
+    <!-- IE Popup -->
     <div class="retro-popup" id="ieWindow">
         <div class="title-bar">
             <div class="title-bar-text">
@@ -440,62 +473,90 @@
                 <div class="control-btn close-btn">X</div>
             </div>
         </div>
-
         <div class="ie-toolbar">
             <span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span>
         </div>
-
         <div class="ie-address-bar">
             <span>Address</span>
             <div class="address-input">http://mogi-archive.hk/候補名單_v1.0</div>
         </div>
 
         <div class="window-body" id="appBody">
-            <div class="vhs-overlay"></div>
-            <div class="vhs-noise"></div>
-            <div class="wall-bg"></div>
-            <div class="neon-strip top"></div>
-            <div class="neon-strip bottom"></div>
 
-            <!-- Ghost brand mark — visible before submission -->
-            <div class="brand-ghost">
-                <img src="assets/logo.png" alt="MOGI">
-                <span class="brand-tagline">九龍 · Kowloon</span>
+            <!-- SVG clip-path def for wall hole -->
+            <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+                <defs>
+                    <clipPath id="wallHoleClip">
+                        <path id="holeClipPath" clip-rule="evenodd" fill-rule="evenodd" d=""/>
+                    </clipPath>
+                </defs>
+            </svg>
+
+            <!-- Scene 2: Coming Soon (sits behind wall) -->
+            <div id="comingSoonScene">
+                <div class="cs-vhs-overlay"></div>
+                <div class="cs-vhs-noise"></div>
+                <div id="holeGlow"></div>
+                <div class="cs-content">
+                    <div class="cs-mogi">MOGI</div>
+                    <div class="cs-mogi-zh">摩 奇</div>
+                    <div class="cs-divider">————————————————————————————</div>
+                    <div class="cs-coming-soon">COMING SOON<span class="cs-blink">_</span></div>
+                    <div class="cs-sub">SS25 · 九龍</div>
+                </div>
             </div>
 
-            <div class="scene" id="scene">
-                <div class="memo-wrapper" id="memo">
-                    <img src="assets/memo.png" class="memo-base-img">
-
-                    <div class="memo">
-                        <div class="spray-overlay" id="sprayOverlay">
-                            <div class="spray-splatter"></div>
-                            <img src="assets/logo.png" class="mogi-logo">
-                            <img src="assets/spray-can.png" id="sprayCan" class="spray-can">
-                        </div>
-
-                        <div class="title">MOGI WAITLIST v1.0</div>
-                        <div class="title-zh">候補名單 · 摩奇品牌</div>
-                        <div class="separator">————————————————————————————</div>
-                        <div class="intro">YOU ARE ABOUT TO ENTER THE ARCHIVE.</div>
-                        <div class="body-text">This is not a newsletter. This is not a club.<br>This is a list of names who knew before mogi existed.</div>
-                        <div class="body-text-zh">懂得的自然懂。</div>
-                        <div class="separator">————————————————————————————</div>
-
-                        <form id="archiveForm">
-                            <div class="input-group">
-                                <input type="email" id="emailInput" placeholder="[ ENTER YOUR EMAIL ]" required autocomplete="off">
+            <!-- Scene 1: Wall (gets clip-path hole punched through it) -->
+            <div id="wallLayer">
+                <div class="vhs-overlay"></div>
+                <div class="vhs-noise"></div>
+                <div class="wall-bg"></div>
+                <div class="neon-strip top"></div>
+                <div class="neon-strip bottom"></div>
+                <div class="brand-ghost">
+                    <img src="assets/logo.png" alt="MOGI">
+                    <span class="brand-tagline">九龍 · Kowloon</span>
+                </div>
+                <div class="scene" id="scene">
+                    <div class="memo-wrapper" id="memo">
+                        <img src="assets/memo.png" class="memo-base-img">
+                        <div class="memo">
+                            <div class="spray-overlay" id="sprayOverlay">
+                                <div class="spray-splatter"></div>
+                                <img src="assets/logo.png" class="mogi-logo" id="mogiLogo">
+                                <img src="assets/spray-can.png" id="sprayCan" class="spray-can">
                             </div>
-                            <div class="form-error" id="formError">CONNECTION FAILED. TRY AGAIN.</div>
-                            <button type="submit" id="submitBtn">[ENTER THE ARCHIVE]</button>
-                        </form>
+                            <div class="title">MOGI WAITLIST v1.0</div>
+                            <div class="title-zh">候補名單 · 摩奇品牌</div>
+                            <div class="separator">————————————————————————————</div>
+                            <div class="intro">YOU ARE ABOUT TO ENTER THE ARCHIVE.</div>
+                            <div class="body-text">This is not a newsletter. This is not a club.<br>This is a list of names who knew before mogi existed.</div>
+                            <div class="body-text-zh">懂得的自然懂。</div>
+                            <div class="separator">————————————————————————————</div>
+                            <form id="archiveForm">
+                                <div class="input-group">
+                                    <input type="email" id="emailInput" placeholder="[ ENTER YOUR EMAIL ]" required autocomplete="off">
+                                </div>
+                                <div class="form-error" id="formError">CONNECTION FAILED. TRY AGAIN.</div>
+                                <button type="submit" id="submitBtn">[ENTER THE ARCHIVE]</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="hand-overlay">
+                        <img src="assets/hand.png" class="hand-img">
                     </div>
                 </div>
-
-                <div class="hand-overlay">
-                    <img src="assets/hand.png" class="hand-img">
-                </div>
             </div>
+
+            <!-- Hole VFX: cracks + dust (above wall, below fist) -->
+            <div id="holeVfx">
+                <svg id="crackSvg"></svg>
+                <div id="dustContainer"></div>
+            </div>
+
+            <!-- Punch fist (topmost) -->
+            <div id="punchFist">✊</div>
+
         </div>
     </div>
 
@@ -519,16 +580,21 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ieWindow = document.getElementById('ieWindow');
-            const appBody = document.getElementById('appBody');
-            const form = document.getElementById('archiveForm');
+            const ieWindow     = document.getElementById('ieWindow');
+            const appBody      = document.getElementById('appBody');
+            const wallLayer    = document.getElementById('wallLayer');
+            const form         = document.getElementById('archiveForm');
             const sprayOverlay = document.getElementById('sprayOverlay');
-            const submitBtn = document.getElementById('submitBtn');
-            const emailInput = document.getElementById('emailInput');
-            const taskbarTab = document.getElementById('taskbarTab');
-            const formError = document.getElementById('formError');
+            const submitBtn    = document.getElementById('submitBtn');
+            const emailInput   = document.getElementById('emailInput');
+            const taskbarTab   = document.getElementById('taskbarTab');
+            const formError    = document.getElementById('formError');
+            const punchFist    = document.getElementById('punchFist');
+            const holeVfx      = document.getElementById('holeVfx');
+            const holeGlow     = document.getElementById('holeGlow');
+            const holeClipPath = document.getElementById('holeClipPath');
 
-            // Live HKT clock (UTC+8)
+            // ── Live HKT clock ──────────────────────────────
             function updateClock() {
                 const now = new Date();
                 const hkt = new Date(now.getTime() + (8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000));
@@ -541,35 +607,155 @@
             updateClock();
             setInterval(updateClock, 30000);
 
-            // 1. Pop in centered
+            // ── Popup sequence ──────────────────────────────
             setTimeout(() => {
                 ieWindow.classList.add('pop-in');
                 taskbarTab.classList.add('visible');
             }, 800);
-
-            // 2. Expand to fullscreen
-            setTimeout(() => {
-                ieWindow.classList.add('fullscreen');
-            }, 2000);
-
-            // 3. Trigger memo animation after expansion
+            setTimeout(() => { ieWindow.classList.add('fullscreen'); }, 2000);
             ieWindow.addEventListener('transitionend', function handler(e) {
                 if ((e.propertyName === 'top' || e.propertyName === 'width') && ieWindow.classList.contains('fullscreen')) {
-                    setTimeout(() => {
-                        appBody.classList.add('play-anim');
-                    }, 800);
+                    setTimeout(() => { appBody.classList.add('play-anim'); }, 800);
                     ieWindow.removeEventListener('transitionend', handler);
                 }
             });
 
-            // 4. Form submit — async to Airtable via /api/subscribe
+            // ── Hole path builder ───────────────────────────
+            // Pre-generate jagged profile (fixed so hole shape is consistent)
+            const N_PTS = 28;
+            const jagProfile = Array.from({ length: N_PTS }, (_, i) => {
+                // Deterministic jag using sine to avoid Math.random between frames
+                return 0.72 + 0.52 * Math.abs(Math.sin(i * 2.3 + 0.7));
+            });
+
+            function buildHolePath(cx, cy, r, W, H) {
+                const outer = `M0,0 L${W},0 L${W},${H} L0,${H} Z`;
+                if (r <= 0) return outer;
+                const pts = jagProfile.map((jag, i) => {
+                    const angle = (i / N_PTS) * Math.PI * 2;
+                    const rx = (cx + Math.cos(angle) * r * jag).toFixed(2);
+                    const ry = (cy + Math.sin(angle) * r * jag).toFixed(2);
+                    return `${rx},${ry}`;
+                });
+                return `${outer} M${pts.join(' L')} Z`;
+            }
+
+            // ── Dust particles ──────────────────────────────
+            function spawnDust(cx, cy) {
+                const container = document.getElementById('dustContainer');
+                for (let i = 0; i < 30; i++) {
+                    const el = document.createElement('div');
+                    el.className = 'dust-particle';
+                    const angle  = Math.random() * Math.PI * 2;
+                    const dist   = 40 + Math.random() * 160;
+                    const size   = 2 + Math.random() * 6;
+                    el.style.cssText = `
+                        left:${cx}px; top:${cy}px;
+                        width:${size}px; height:${size}px;
+                        --dx:${(Math.cos(angle) * dist).toFixed(1)}px;
+                        --dy:${(Math.sin(angle) * dist).toFixed(1)}px;
+                        --dur:${(0.5 + Math.random() * 1.2).toFixed(2)}s;
+                        --delay:${(Math.random() * 0.15).toFixed(2)}s;
+                    `;
+                    container.appendChild(el);
+                    el.addEventListener('animationend', () => el.remove(), { once: true });
+                }
+            }
+
+            // ── Crack lines ─────────────────────────────────
+            function spawnCracks(cx, cy) {
+                const svg = document.getElementById('crackSvg');
+                const NUM = 10;
+                for (let i = 0; i < NUM; i++) {
+                    const baseAngle = (i / NUM) * Math.PI * 2 + (Math.sin(i * 1.7) * 0.4);
+                    const len = 55 + Math.abs(Math.sin(i * 2.1)) * 130;
+                    // Two-segment jagged crack
+                    const mx = cx + Math.cos(baseAngle) * len * 0.45 + (Math.sin(i * 3.1) * 18);
+                    const my = cy + Math.sin(baseAngle) * len * 0.45 + (Math.cos(i * 2.7) * 18);
+                    const ex = cx + Math.cos(baseAngle) * len;
+                    const ey = cy + Math.sin(baseAngle) * len;
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+                    line.setAttribute('points', `${cx},${cy} ${mx.toFixed(1)},${my.toFixed(1)} ${ex.toFixed(1)},${ey.toFixed(1)}`);
+                    line.setAttribute('class', 'crack-line');
+                    line.style.animationDelay = `${i * 0.02}s`;
+                    svg.appendChild(line);
+                }
+            }
+
+            // ── Main punch sequence ─────────────────────────
+            function triggerPunchSequence() {
+                const W  = appBody.offsetWidth;
+                const H  = appBody.offsetHeight;
+                const cx = W / 2;
+                const cy = H / 2;
+
+                // Show fist, centered
+                punchFist.style.left = cx + 'px';
+                punchFist.style.top  = cy + 'px';
+                punchFist.classList.add('punch-active');
+
+                // Impact at ~32% of 0.9s = ~290ms
+                setTimeout(() => {
+                    // Shake
+                    wallLayer.classList.add('shake');
+                    setTimeout(() => wallLayer.classList.remove('shake'), 420);
+
+                    // VFX
+                    spawnDust(cx, cy);
+                    spawnCracks(cx, cy);
+                    holeVfx.classList.add('active');
+
+                    // Glow through hole
+                    holeGlow.style.left   = cx + 'px';
+                    holeGlow.style.top    = cy + 'px';
+                    holeGlow.style.width  = '200px';
+                    holeGlow.style.height = '200px';
+                    holeGlow.style.opacity = '1';
+
+                    // Apply clip-path and animate hole growing
+                    wallLayer.style.clipPath = 'url(#wallHoleClip)';
+                    // Init tiny hole so clip path takes effect immediately
+                    holeClipPath.setAttribute('d', buildHolePath(cx, cy, 5, W, H));
+
+                    const maxR    = Math.sqrt(W * W + H * H) * 0.78;
+                    const dur     = 2800;
+                    let   startTs = null;
+
+                    function animHole(ts) {
+                        if (!startTs) startTs = ts;
+                        const p    = Math.min((ts - startTs) / dur, 1);
+                        const ease = 1 - Math.pow(1 - p, 2.8); // ease-out
+                        const r    = 5 + (maxR - 5) * ease;
+
+                        holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
+
+                        // Grow glow with hole
+                        const gs = Math.min(r * 2.5, Math.max(W, H) * 1.2);
+                        holeGlow.style.width  = gs + 'px';
+                        holeGlow.style.height = gs + 'px';
+
+                        if (p < 1) {
+                            requestAnimationFrame(animHole);
+                        } else {
+                            // Hole fills screen — fade out wall layer
+                            wallLayer.style.transition = 'opacity 0.4s ease-out';
+                            wallLayer.style.opacity = '0';
+                            holeVfx.style.transition = 'opacity 0.4s ease-out';
+                            holeVfx.style.opacity = '0';
+                        }
+                    }
+                    requestAnimationFrame(animHole);
+
+                }, 290);
+            }
+
+            // ── Form submit ─────────────────────────────────
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const email = emailInput.value.trim();
                 if (!email) return;
 
                 submitBtn.textContent = '[ CONNECTING... ]';
-                submitBtn.classList.add('loading');
                 submitBtn.disabled = true;
                 emailInput.disabled = true;
                 formError.classList.remove('visible');
@@ -586,12 +772,14 @@
                         submitBtn.style.background = '#2d2d2d';
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
+
+                        // Trigger punch after spray completes (~4.5s)
+                        setTimeout(triggerPunchSequence, 4500);
                     } else {
                         throw new Error('Server error');
                     }
                 } catch {
                     submitBtn.textContent = '[ENTER THE ARCHIVE]';
-                    submitBtn.classList.remove('loading');
                     submitBtn.disabled = false;
                     emailInput.disabled = false;
                     formError.classList.add('visible');
