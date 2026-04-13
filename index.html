@@ -75,10 +75,8 @@
         .task-tab.visible { opacity: 1; }
         .task-tab img { width: 14px; height: 14px; }
 
-        /* =========================================
-           IE POPUP
-           ========================================= */
-        .retro-popup {
+        /* IE POPUP CSS REMOVED — chrome stripped */
+        .retro-popup-unused {
             position: fixed; top: 50%; left: 50%;
             width: min(90vw, 600px); height: min(60vh, 450px);
             transform: translate(-50%, -50%) scale(0); opacity: 0;
@@ -144,7 +142,7 @@
            WINDOW BODY
            ========================================= */
         .window-body {
-            flex-grow: 1; position: relative; width: 100%; height: 100%;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             overflow: hidden; font-family: 'Courier Prime', monospace; cursor: crosshair;
         }
 
@@ -413,19 +411,19 @@
                 overflow: hidden;   /* prevent bleed-out */
             }
 
-            /* Typography — scale right down to fit */
-            .title     { font-size: 0.5rem; }
-            .title-zh  { font-size: 0.38rem; margin-bottom: 1px; }
-            .intro     { font-size: 0.46rem; margin-bottom: 2px; }
-            .body-text { font-size: 0.4rem; line-height: 1.18; margin-bottom: 2px; }
-            .body-text-zh { font-size: 0.36rem; margin-bottom: 2px; }
-            .separator { margin: 1px 0; font-size: 0.38rem; letter-spacing: -1px; }
+            /* Typography — readable */
+            .title     { font-size: 0.72rem; }
+            .title-zh  { font-size: 0.52rem; margin-bottom: 2px; }
+            .intro     { font-size: 0.62rem; margin-bottom: 3px; }
+            .body-text { font-size: 0.54rem; line-height: 1.3; margin-bottom: 3px; }
+            .body-text-zh { font-size: 0.48rem; margin-bottom: 3px; }
+            .separator { margin: 2px 0; font-size: 0.5rem; letter-spacing: -1px; }
 
-            /* Form — compact */
-            form { gap: 3px; width: 92%; }
+            /* Form — compact but usable */
+            form { gap: 4px; width: 85%; }
             .input-group { padding: 2px; border-width: 1px; width: 100%; max-width: 100%; }
-            input[type="email"] { font-size: 10px; }
-            button { padding: 4px 2px; font-size: 0.42rem; width: 100%; max-width: 100%; min-height: 24px; }
+            input[type="email"] { font-size: 0.62rem; }
+            button { padding: 5px 4px; font-size: 0.62rem; width: 100%; max-width: 100%; min-height: 30px; }
 
             /* Misc */
             .brand-ghost img { width: 200px; }
@@ -445,10 +443,10 @@
         }
         @media (max-width: 380px) {
             .memo-wrapper { width: 240%; }
-            .title     { font-size: 0.46rem; }
-            .intro     { font-size: 0.42rem; }
-            .body-text { font-size: 0.37rem; }
-            button     { font-size: 0.38rem; min-height: 22px; }
+            .title     { font-size: 0.65rem; }
+            .intro     { font-size: 0.55rem; }
+            .body-text { font-size: 0.48rem; }
+            button     { font-size: 0.55rem; min-height: 26px; }
         }
 
         /* =========================================
@@ -476,44 +474,7 @@
 </head>
 <body>
 
-    <!-- Desktop -->
-    <div class="desktop-environment">
-        <div class="desktop-icons">
-            <div class="icon-wrapper">
-                <svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="32" rx="2" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="12" y="16" width="40" height="24" fill="#000080"/><path d="M28 44 L36 44 L40 52 L24 52 Z" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="20" y="52" width="24" height="4" fill="#a0a0a0"/></svg>
-                <span>My Computer</span>
-            </div>
-            <div class="icon-wrapper">
-                <img src="assets/internet-icon.png" alt="mogi.exe">
-                <span>mogi.exe</span>
-                <span class="zh">摩奇</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- IE Popup -->
-    <div class="retro-popup" id="ieWindow">
-        <div class="title-bar">
-            <div class="title-bar-text">
-                <img src="assets/internet-icon.png" alt="ie logo">
-                網頁瀏覽器 — MOGI Archive
-                <span class="zh-title">/ 候補名單</span>
-            </div>
-            <div class="title-bar-controls">
-                <div class="control-btn">_</div>
-                <div class="control-btn">□</div>
-                <div class="control-btn close-btn">X</div>
-            </div>
-        </div>
-        <div class="ie-toolbar">
-            <span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span>
-        </div>
-        <div class="ie-address-bar">
-            <span>Address</span>
-            <div class="address-input">http://mogi-archive.hk/候補名單_v1.0</div>
-        </div>
-
-        <div class="window-body" id="appBody">
+    <div class="window-body" id="appBody">
 
             <!-- SVG clip-path def for wall hole -->
             <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
@@ -564,10 +525,10 @@
                             <div class="separator">————————————————————————————</div>
                             <form id="archiveForm">
                                 <div class="input-group">
-                                    <input type="email" id="emailInput" placeholder="[ ENTER YOUR EMAIL ]" required autocomplete="off">
+                                    <input type="email" id="emailInput" placeholder="[ EMAIL ]" required autocomplete="off">
                                 </div>
                                 <div class="form-error" id="formError">CONNECTION FAILED. TRY AGAIN.</div>
-                                <button type="submit" id="submitBtn">[ENTER THE ARCHIVE]</button>
+                                <button type="submit" id="submitBtn">[ ARCHIVE ]</button>
                             </form>
                         </div>
                     </div>
@@ -589,36 +550,15 @@
             <div id="punchFist"><img src="assets/fist.png" alt="fist"></div>
 
         </div>
-    </div>
-
-    <!-- Taskbar -->
-    <div class="taskbar">
-        <div class="start-button">
-            <svg viewBox="0 0 24 24"><path d="M0,3.4l10-1.4v9.6H0V3.4z M11,1.8l13-1.8v11.6H11V1.8z M0,12.5h10v9.6L0,20.6V12.5z M11,12.5h13v11.6l-13-1.8V12.5z"/></svg>
-            開始
-        </div>
-        <div class="taskbar-tasks">
-            <div class="task-tab" id="taskbarTab">
-                <img src="assets/internet-icon.png" alt="ie icon">
-                <span>網頁瀏覽器</span>
-            </div>
-        </div>
-        <div class="system-tray">
-            <span class="tray-city">HKT</span>
-            <span id="clock">--:-- --</span>
-        </div>
-    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            const ieWindow     = document.getElementById('ieWindow');
             const appBody      = document.getElementById('appBody');
             const wallLayer    = document.getElementById('wallLayer');
             const form         = document.getElementById('archiveForm');
             const sprayOverlay = document.getElementById('sprayOverlay');
             const submitBtn    = document.getElementById('submitBtn');
             const emailInput   = document.getElementById('emailInput');
-            const taskbarTab   = document.getElementById('taskbarTab');
             const formError    = document.getElementById('formError');
             const punchFist    = document.getElementById('punchFist');
             const holeVfx      = document.getElementById('holeVfx');
@@ -626,31 +566,8 @@
             const holeClipPath = document.getElementById('holeClipPath');
             const holeOverlay  = document.getElementById('holeOverlay');
 
-            // ── Live HKT clock ──────────────────────────────
-            function updateClock() {
-                const now = new Date();
-                const hkt = new Date(now.getTime() + (8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000));
-                let h = hkt.getUTCHours();
-                const m = String(hkt.getUTCMinutes()).padStart(2, '0');
-                const ampm = h >= 12 ? 'PM' : 'AM';
-                h = h % 12 || 12;
-                document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
-            }
-            updateClock();
-            setInterval(updateClock, 30000);
-
-            // ── Popup sequence ──────────────────────────────
-            setTimeout(() => {
-                ieWindow.classList.add('pop-in');
-                taskbarTab.classList.add('visible');
-            }, 800);
-            setTimeout(() => { ieWindow.classList.add('fullscreen'); }, 2000);
-            ieWindow.addEventListener('transitionend', function handler(e) {
-                if ((e.propertyName === 'top' || e.propertyName === 'width') && ieWindow.classList.contains('fullscreen')) {
-                    setTimeout(() => { appBody.classList.add('play-anim'); }, 800);
-                    ieWindow.removeEventListener('transitionend', handler);
-                }
-            });
+            // Start memo slap
+            setTimeout(() => { appBody.classList.add('play-anim'); }, 600);
 
             // ── Hole helpers ─────────────────────────────────
             const N_PTS = 28;
@@ -825,7 +742,7 @@
                         throw new Error('Server error');
                     }
                 } catch {
-                    submitBtn.textContent = '[ENTER THE ARCHIVE]';
+                    submitBtn.textContent = '[ ARCHIVE ]';
                     submitBtn.disabled = false;
                     emailInput.disabled = false;
                     formError.classList.add('visible');
