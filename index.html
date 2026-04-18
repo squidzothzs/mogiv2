@@ -222,9 +222,8 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #1a1a1a;
             background-image: url('assets/wall-bg.jpg');
-            background-size: cover; background-position: center;
+            background-size: cover; background-position: center; background-repeat: no-repeat;
             opacity: 1; z-index: 1;
-            /* filter removed */
         }
         .neon-strip { position: absolute; pointer-events: none; z-index: 4; }
         .neon-strip.top {
@@ -290,8 +289,8 @@
         .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
-        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
-        .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.2s; }
+        .spray-active .spray-splatter { animation: spraySplatterAnim 3.2s ease-out forwards; animation-delay: 0s; }
         .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
         @keyframes sprayCanAnim {
             0%   { opacity:0; transform:translate(300px,-200px) rotate(-20deg); }
@@ -444,7 +443,7 @@
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
             .mogi-logo { max-width: 1200px; overflow: visible; }
-            .spray-active .spray-can { animation: sprayCanAnimMobile 5s ease-in-out forwards; }
+            .spray-active .spray-can { animation: sprayCanAnimMobile 3s ease-in-out forwards; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
