@@ -746,10 +746,11 @@
 
                                     setTimeout(() => {
                                         const csOverlay = document.getElementById('comingSoonOverlay');
+                                        csOverlay.style.transition = 'none';
                                         csOverlay.classList.add('active');
                                         const tb = document.querySelector('.taskbar');
                                         if (tb) {
-                                            tb.style.transition    = 'opacity 0.6s ease-out';
+                                            tb.style.transition    = 'none';
                                             tb.style.opacity       = '0';
                                             tb.style.pointerEvents = 'none';
                                         }
