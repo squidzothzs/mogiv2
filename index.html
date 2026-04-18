@@ -461,7 +461,7 @@
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
             .mogi-logo { max-width: 1200px; overflow: visible; }
-            .spray-active .spray-can { animation: sprayCanAnimMobile 1.3s ease-in-out forwards; }
+            .spray-active .spray-can { animation: sprayCanAnimMobile 2.5s ease-in-out forwards; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
@@ -826,8 +826,8 @@
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
 
-                        // Trigger punch ~1s after spray completes (spray ends ~4.3s)
-                        setTimeout(triggerPunchSequence, 5400);
+                        // Trigger punch shortly after spray can leaves (can finishes ~3s desktop / 2.5s mobile)
+                        setTimeout(triggerPunchSequence, 3200);
                     } else {
                         throw new Error('Server error');
                     }
