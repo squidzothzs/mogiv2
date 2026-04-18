@@ -683,39 +683,81 @@
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        const phase2Dur = 2200;
-                        let ts2 = null;
-                        function animPhase2(ts) {
-                            if (!ts2) ts2 = ts;
-                            const p    = Math.min((ts - ts2) / phase2Dur, 1);
-                            const ease = 1 - Math.pow(1 - p, 2.5);
-                            const r    = peepR + (maxR - peepR) * ease;
-                            setHole(cx, cy, r, W, H);
-                            const gs = Math.min(r * 2.5, Math.max(W, H) * 1.2);
-                            holeGlow.style.width  = gs + 'px';
-                            holeGlow.style.height = gs + 'px';
-                            if (p < 1) {
-                                requestAnimationFrame(animPhase2);
-                            } else {
-                                wallLayer.style.transition = 'opacity 0.5s ease-out';
-                                wallLayer.style.opacity = '0';
-                                holeVfx.style.transition = 'opacity 0.5s ease-out';
-                                holeVfx.style.opacity = '0';
-                                holeOverlay.style.transition = 'opacity 0.5s ease-out';
-                                holeOverlay.style.opacity = '0';
-                                // Transition: full-viewport coming soon covers everything
-                                setTimeout(() => {
-                                    const csOverlay = document.getElementById('comingSoonOverlay');
-                                    csOverlay.classList.add('active');
-                                    // Also fade out taskbar for belt-and-suspenders
-                                    const tb = document.querySelector('.taskbar');
-                                    tb.style.transition = 'opacity 0.6s ease-out';
-                                    tb.style.opacity = '0';
-                                    tb.style.pointerEvents = 'none';
-                                }, 500);
+                        // ── Camera zoom-into-hole ──────────────────────────────────
+                        // Instead of expanding the clip-path hole, we zoom the entire
+                        // wallLayer toward the hole center. The clip-path hole stays the
+                        // same radius in local space but grows proportionally in screen
+                        // space as the wall scales up, creating a "fly through" feel.
+
+                        // Fade paperhole torn-edge overlay quickly — it would look wrong flying
+                        holeOverlay.style.transition = 'opacity 0.35s ease-out';
+                        holeOverlay.style.opacity = '0';
+
+                        // Pre-grow the glow to signal the camera is about to dive
+                        holeGlow.style.transition = 'width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out';
+                        holeGlow.style.width   = '340px';
+                        holeGlow.style.height  = '340px';
+                        holeGlow.style.opacity = '1';
+
+                        // Aim the zoom pivot exactly at the hole center
+                        wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
+                        wallLayer.style.willChange = 'transform, filter';
+
+                        // Give glow a beat to breathe, then dive
+                        setTimeout(() => {
+                            const phase2Dur   = 1700; // ms — shorter = more impact
+                            const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
+                            const comingSoon  = document.getElementById('comingSoonScene');
+                            let ts2 = null;
+
+                            function animPhase2(ts) {
+                                if (!ts2) ts2 = ts;
+                                const p = Math.min((ts - ts2) / phase2Dur, 1);
+
+                                // Cubic ease-in: slow start → rapid lunge forward
+                                const ease = p * p * p;
+
+                                // Wall rushes toward viewer
+                                const scale = 1 + ease * (targetScale - 1);
+                                wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
+
+                                // Motion blur tied to instantaneous velocity (d/dp of p^3 = 3p^2)
+                                const velocity = 3 * p * p;
+                                const blur = velocity * 5;
+                                wallLayer.style.filter = blur > 0.3 ? 'blur(' + blur.toFixed(2) + 'px)' : '';
+
+                                // Coming-soon scene zooms toward viewer at slower rate (parallax)
+                                const bgScale = 1 + ease * 0.35;
+                                comingSoon.style.transform = 'scale(' + bgScale.toFixed(4) + ')';
+                                comingSoon.style.transformOrigin = cx + 'px ' + cy + 'px';
+
+                                // Glow swells as we approach the light source
+                                const glowSz = 340 + ease * Math.max(W, H) * 2.2;
+                                holeGlow.style.transition = 'none';
+                                holeGlow.style.width  = glowSz + 'px';
+                                holeGlow.style.height = glowSz + 'px';
+
+                                if (p < 1) {
+                                    requestAnimationFrame(animPhase2);
+                                } else {
+                                    // Snap wall away, show coming-soon
+                                    wallLayer.style.opacity = '0';
+                                    holeVfx.style.opacity   = '0';
+
+                                    setTimeout(() => {
+                                        const csOverlay = document.getElementById('comingSoonOverlay');
+                                        csOverlay.classList.add('active');
+                                        const tb = document.querySelector('.taskbar');
+                                        if (tb) {
+                                            tb.style.transition    = 'opacity 0.6s ease-out';
+                                            tb.style.opacity       = '0';
+                                            tb.style.pointerEvents = 'none';
+                                        }
+                                    }, 100);
+                                }
                             }
-                        }
-                        requestAnimationFrame(animPhase2);
+                            requestAnimationFrame(animPhase2);
+                        }, 350);
                     }
 
                 }, 290);
