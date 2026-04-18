@@ -303,16 +303,16 @@
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
         @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(12vw,-12vw) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(6vw,-6vw) rotate(-15deg); }
-            20%  { transform:translate(-10vw,-5vw) rotate(-10deg); }
-            30%  { transform:translate(8vw,-2vw) rotate(-15deg); }
-            40%  { transform:translate(-6vw,1vw) rotate(-10deg); }
-            50%  { transform:translate(6vw,5vw) rotate(-15deg); }
-            60%  { transform:translate(-4vw,17vw) rotate(-5deg); }
-            75%  { transform:translate(6vw,20vw) rotate(-10deg); }
-            90%  { opacity:1; transform:translate(12vw,30vw) rotate(10deg); }
-            100% { opacity:0; transform:translate(20vw,40vw) rotate(20deg); }
+            0%   { opacity:0; transform:translate(25vw,-20vw) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(15vw,-12vw) rotate(-15deg); }
+            20%  { transform:translate(-18vw,-8vw) rotate(-10deg); }
+            30%  { transform:translate(16vw,-4vw) rotate(-15deg); }
+            40%  { transform:translate(-12vw,2vw) rotate(-10deg); }
+            50%  { transform:translate(14vw,8vw) rotate(-15deg); }
+            60%  { transform:translate(-8vw,22vw) rotate(-5deg); }
+            75%  { transform:translate(12vw,28vw) rotate(-10deg); }
+            90%  { opacity:1; transform:translate(22vw,38vw) rotate(10deg); }
+            100% { opacity:0; transform:translate(35vw,50vw) rotate(20deg); }
         }
 
         /* Hand */
@@ -440,7 +440,7 @@
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
             .mogi-logo { max-width: 1200px; overflow: visible; }
-            .spray-active .spray-can { animation: sprayCanAnimMobile 3s ease-in-out forwards; }
+            .spray-active .spray-can { animation: sprayCanAnimMobile 2s ease-in-out forwards; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
@@ -674,8 +674,8 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Hold peephole for 1.6s
-                            setTimeout(startPhase2, 1600);
+                            // Flow directly into zoom — no hold
+                            startPhase2();
                         }
                     }
                     requestAnimationFrame(animPhase1);
