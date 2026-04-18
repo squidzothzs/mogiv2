@@ -224,7 +224,7 @@
             background-image: url('assets/wall-bg.jpg');
             background-size: cover; background-position: center;
             opacity: 1; z-index: 1;
-            filter: sepia(0.4) contrast(1.15) saturate(0.75) hue-rotate(-8deg);
+            /* filter removed */
         }
         .neon-strip { position: absolute; pointer-events: none; z-index: 4; }
         .neon-strip.top {
@@ -287,7 +287,7 @@
 
         /* Spray animations */
         .spray-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 60; }
-        .mogi-logo { width: 100%; max-width: 2250px; transform: scale(1.5) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
+        .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
         .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
@@ -307,6 +307,16 @@
         }
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
+        @keyframes sprayCanAnimMobile {
+            0%   { opacity:0; transform:translate(60px,-60px) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(30px,-30px) rotate(-15deg); }
+            25%  { transform:translate(-50px,-10px) rotate(-10deg); }
+            40%  { transform:translate(40px,20px) rotate(-15deg); }
+            55%  { transform:translate(-30px,50px) rotate(-10deg); }
+            70%  { transform:translate(40px,90px) rotate(-5deg); }
+            85%  { opacity:1; transform:translate(60px,140px) rotate(10deg); }
+            100% { opacity:0; transform:translate(100px,200px) rotate(20deg); }
+        }
 
         /* Hand */
         .hand-overlay { position: absolute; top:50%; left:50%; width:600px; height:600px; margin-top:-300px; margin-left:-300px; pointer-events:none; z-index:50; opacity:0; transform:scale(2) translateY(150%); }
@@ -400,15 +410,19 @@
             .ie-toolbar { gap: 8px; font-size: 10px; }
             .address-input { font-size: 10px; padding: 2px 4px; }
 
-            /* Memo note — bigger so the writable area has real estate */
-            .memo-wrapper { width: 220%; flex-shrink: 0; }
+            /* Memo note — fills screen width, scaled up, truly centered */
+            .memo-wrapper {
+                width: 220%;
+                left: -60%;          /* (220-100)/2 = 60% pushes it centered */
+                top: 50%;
+                margin-top: calc(-220vw / 3.556);  /* half height (aspect 2063:1160 ≈ 1.778, so height=width/1.778) */
+            }
 
-            /* Content box: match desktop proportions exactly so it
-               aligns with the printed note's yellow zone */
+            /* Content box aligned to note's writable zone */
             .memo {
                 top: 24%; bottom: 20%;
                 left: 28%; right: 28%;
-                overflow: hidden;   /* prevent bleed-out */
+                overflow: visible;
             }
 
             /* Typography — readable */
@@ -429,7 +443,8 @@
             .brand-ghost img { width: 200px; }
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
-            .mogi-logo { max-width: 1200px; }
+            .mogi-logo { max-width: 1200px; overflow: visible; }
+            .spray-active .spray-can { animation: sprayCanAnimMobile 5s ease-in-out forwards; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
@@ -442,7 +457,7 @@
             100% { transform:scale(0.8) translateY(800px); opacity:0; }
         }
         @media (max-width: 380px) {
-            .memo-wrapper { width: 240%; }
+            .memo-wrapper { width: 240%; left: -70%; margin-top: calc(-240vw / 3.556); }
             .title     { font-size: 0.65rem; }
             .intro     { font-size: 0.55rem; }
             .body-text { font-size: 0.48rem; }
