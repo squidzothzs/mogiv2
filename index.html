@@ -289,10 +289,10 @@
         .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
-        /* Spray sequence: can first → logo appears mid-spray → then punch */
-        .spray-active .spray-can { animation: sprayCanAnim 3.2s ease-in-out forwards; }
-        .spray-active .spray-splatter { animation: spraySplatterAnim 2s ease-out forwards; animation-delay: 1.4s; }
-        .spray-active .mogi-logo { animation: fadeInProgressive 1.6s ease-out forwards; animation-delay: 1.8s; }
+        /* Desktop: all spray animations together */
+        .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
+        .spray-active .spray-splatter { animation: spraySplatterAnim 3.2s ease-out forwards; animation-delay: 0s; }
+        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.2s; }
         @keyframes sprayCanAnim {
             0%   { opacity:0; transform:translate(300px,-200px) rotate(-20deg); }
             10%  { opacity:1; transform:translate(150px,-150px) rotate(-15deg); }
@@ -444,7 +444,10 @@
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
             .mogi-logo { max-width: 1200px; overflow: visible; }
+            /* Mobile: spray sequence — can first, logo fades in mid-spray, then punch */
             .spray-active .spray-can { animation: sprayCanAnimMobile 3.2s ease-in-out forwards; }
+            .spray-active .spray-splatter { animation: spraySplatterAnim 2s ease-out forwards; animation-delay: 1.4s; }
+            .spray-active .mogi-logo { animation: fadeInProgressive 1.6s ease-out forwards; animation-delay: 1.8s; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
@@ -751,8 +754,10 @@
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
 
-                        // Trigger punch after spray: can 3.2s + logo starts 1.8s in + 1.6s fade = done at 3.4s, brief logo moment, then punch
-                        setTimeout(triggerPunchSequence, 4200);
+                        // Mobile: sequenced spray (done at 3.4s), punch at 4.2s
+                        // Desktop: concurrent spray (done at 3.2s), punch at 4.5s
+                        const punchDelay = window.innerWidth <= 600 ? 4200 : 4500;
+                        setTimeout(triggerPunchSequence, punchDelay);
                     } else {
                         throw new Error('Server error');
                     }
