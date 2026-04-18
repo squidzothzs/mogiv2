@@ -280,14 +280,14 @@
         .form-error { font-size: 0.65rem; color: #8b2000; font-family: 'Courier Prime', monospace; display: none; text-align: center; }
         .form-error.visible { display: block; }
 
-        /* Spray animations */
+        /* Spray animations — MASTER TIMELINE: 0.0s can starts | 0.3s splatter+logo sync */
         .spray-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 60; }
         .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
-        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.2s; }
-        .spray-active .spray-splatter { animation: spraySplatterAnim 3.2s ease-out forwards; animation-delay: 0s; }
-        .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
+        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; animation-delay: 0s; }
         @keyframes sprayCanAnim {
             0%   { opacity:0; transform:translate(300px,-200px) rotate(-20deg); }
             10%  { opacity:1; transform:translate(150px,-150px) rotate(-15deg); }
@@ -303,14 +303,16 @@
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
         @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(60px,-60px) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(30px,-30px) rotate(-15deg); }
-            25%  { transform:translate(-50px,-10px) rotate(-10deg); }
-            40%  { transform:translate(40px,20px) rotate(-15deg); }
-            55%  { transform:translate(-30px,50px) rotate(-10deg); }
-            70%  { transform:translate(40px,90px) rotate(-5deg); }
-            85%  { opacity:1; transform:translate(60px,140px) rotate(10deg); }
-            100% { opacity:0; transform:translate(100px,200px) rotate(20deg); }
+            0%   { opacity:0; transform:translate(12vw,-12vw) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(6vw,-6vw) rotate(-15deg); }
+            20%  { transform:translate(-10vw,-5vw) rotate(-10deg); }
+            30%  { transform:translate(8vw,-2vw) rotate(-15deg); }
+            40%  { transform:translate(-6vw,1vw) rotate(-10deg); }
+            50%  { transform:translate(6vw,5vw) rotate(-15deg); }
+            60%  { transform:translate(-4vw,17vw) rotate(-5deg); }
+            75%  { transform:translate(6vw,20vw) rotate(-10deg); }
+            90%  { opacity:1; transform:translate(12vw,30vw) rotate(10deg); }
+            100% { opacity:0; transform:translate(20vw,40vw) rotate(20deg); }
         }
 
         /* Hand */
