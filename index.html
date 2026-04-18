@@ -740,21 +740,18 @@
                                 if (p < 1) {
                                     requestAnimationFrame(animPhase2);
                                 } else {
-                                    // Snap wall away, show coming-soon
-                                    wallLayer.style.opacity = '0';
-                                    holeVfx.style.opacity   = '0';
-
-                                    setTimeout(() => {
-                                        const csOverlay = document.getElementById('comingSoonOverlay');
-                                        csOverlay.style.transition = 'none';
-                                        csOverlay.classList.add('active');
-                                        const tb = document.querySelector('.taskbar');
-                                        if (tb) {
-                                            tb.style.transition    = 'none';
-                                            tb.style.opacity       = '0';
-                                            tb.style.pointerEvents = 'none';
-                                        }
-                                    }, 100);
+                                    // Snap overlay on in the same frame the zoom lands —
+                                    // no opacity toggle on wallLayer, no timeout, no gap.
+                                    const csOverlay = document.getElementById('comingSoonOverlay');
+                                    csOverlay.style.transition = 'none';
+                                    csOverlay.classList.add('active');
+                                    holeVfx.style.opacity = '0';
+                                    const tb = document.querySelector('.taskbar');
+                                    if (tb) {
+                                        tb.style.transition    = 'none';
+                                        tb.style.opacity       = '0';
+                                        tb.style.pointerEvents = 'none';
+                                    }
                                 }
                             }
                             requestAnimationFrame(animPhase2);
