@@ -303,16 +303,16 @@
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
         @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(25vw,-20vw) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(15vw,-12vw) rotate(-15deg); }
-            20%  { transform:translate(-18vw,-8vw) rotate(-10deg); }
-            30%  { transform:translate(16vw,-4vw) rotate(-15deg); }
-            40%  { transform:translate(-12vw,2vw) rotate(-10deg); }
-            50%  { transform:translate(14vw,8vw) rotate(-15deg); }
-            60%  { transform:translate(-8vw,22vw) rotate(-5deg); }
-            75%  { transform:translate(12vw,28vw) rotate(-10deg); }
-            90%  { opacity:1; transform:translate(22vw,38vw) rotate(10deg); }
-            100% { opacity:0; transform:translate(35vw,50vw) rotate(20deg); }
+            0%   { opacity:0; transform:translate(55vw,-50vw) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(32vw,-32vw) rotate(-15deg); }
+            20%  { transform:translate(-38vw,-20vw) rotate(-10deg); }
+            30%  { transform:translate(34vw,-8vw) rotate(-15deg); }
+            40%  { transform:translate(-32vw,6vw) rotate(-10deg); }
+            50%  { transform:translate(35vw,22vw) rotate(-15deg); }
+            60%  { transform:translate(-26vw,46vw) rotate(-5deg); }
+            75%  { transform:translate(32vw,60vw) rotate(-10deg); }
+            90%  { opacity:1; transform:translate(48vw,75vw) rotate(10deg); }
+            100% { opacity:0; transform:translate(65vw,92vw) rotate(20deg); }
         }
 
         /* Hand */
@@ -394,6 +394,27 @@
         }
 
         /* =========================================
+           DEPTH LAYERS
+           Paper-backing ring + tunnel shadow —
+           visible only through the clip-path hole.
+           ========================================= */
+        #depthLayer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 3; pointer-events: none;
+            background: transparent;
+        }
+        #tunnelShadow {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 7; pointer-events: none;
+            background: transparent;
+        }
+        /* Coming-soon content appears further back / recessed */
+        #comingSoonScene .cs-content {
+            transform: scale(0.72);
+            transform-origin: center center;
+        }
+
+        /* =========================================
            MOBILE
            ========================================= */
         @media (max-width: 600px) {
@@ -440,7 +461,7 @@
             .brand-ghost .brand-tagline { font-size: 7px; }
             .spray-can { width: 90px; }
             .mogi-logo { max-width: 1200px; overflow: visible; }
-            .spray-active .spray-can { animation: sprayCanAnimMobile 2s ease-in-out forwards; }
+            .spray-active .spray-can { animation: sprayCanAnimMobile 1.3s ease-in-out forwards; }
             .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
             #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
@@ -507,6 +528,12 @@
                 </div>
             </div>
 
+            <!-- Depth layers: paper backing ring (z3) + tunnel shadow (z7) --
+                 Both sit between comingSoonScene (z0) and wallLayer (z10).
+                 They are visible only through the clip-path hole. -->
+            <div id="depthLayer"></div>
+            <div id="tunnelShadow"></div>
+
             <!-- Scene 1: Wall (gets clip-path hole punched through it) -->
             <div id="wallLayer">
                 <div class="wall-bg"></div>
@@ -572,6 +599,8 @@
             const holeGlow     = document.getElementById('holeGlow');
             const holeClipPath = document.getElementById('holeClipPath');
             const holeOverlay  = document.getElementById('holeOverlay');
+            const depthLayer   = document.getElementById('depthLayer');
+            const tunnelShadow = document.getElementById('tunnelShadow');
 
             // Start memo slap
             setTimeout(() => { appBody.classList.add('play-anim'); }, 1800);
@@ -594,13 +623,39 @@
 
             function setHole(cx, cy, r, W, H) {
                 holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
-                // Scale paperhole overlay to match hole size (diameter * 1.8 to show torn edges)
+                // Scale paperhole overlay to match hole size
                 const sz = r * 3.6;
                 holeOverlay.style.width  = sz + 'px';
                 holeOverlay.style.height = sz + 'px';
                 holeOverlay.style.left   = cx + 'px';
                 holeOverlay.style.top    = cy + 'px';
                 holeOverlay.style.opacity = r > 0 ? '1' : '0';
+
+                // ── Depth layers: paper backing ring + tunnel-depth shadow ──
+                if (r > 5) {
+                    const ri  = r.toFixed(1);
+                    const ro  = (r * 1.32).toFixed(1);
+                    const rx  = (r * 1.58).toFixed(1);
+                    // Paper ring visible just around the hole edge (warm tan tones)
+                    depthLayer.style.background =
+                        `radial-gradient(circle at ${cx}px ${cy}px,` +
+                        ` transparent ${ri}px,` +
+                        ` rgba(192,155,88,0.97) ${(r+2).toFixed(1)}px,` +
+                        ` rgba(172,135,68,0.92) ${(r+11).toFixed(1)}px,` +
+                        ` rgba(145,110,50,0.78) ${ro}px,` +
+                        ` rgba(90,60,22,0.38)   ${rx}px,` +
+                        ` transparent ${(r*1.82).toFixed(1)}px)`;
+                    // Dark vignette at the hole edge — tunnel depth illusion
+                    tunnelShadow.style.background =
+                        `radial-gradient(circle at ${cx}px ${cy}px,` +
+                        ` transparent 0px,` +
+                        ` transparent ${(r*0.62).toFixed(1)}px,` +
+                        ` rgba(0,0,0,0.38) ${(r*0.86).toFixed(1)}px,` +
+                        ` rgba(0,0,0,0.72) ${ri}px)`;
+                } else {
+                    depthLayer.style.background   = 'transparent';
+                    tunnelShadow.style.background = 'transparent';
+                }
             }
 
             // ── Dust particles ──────────────────────────────
@@ -682,17 +737,19 @@
 
                     function startPhase2() {
                         // ── Camera zoom-into-hole ──────────────────────────────────
-                        // Instead of expanding the clip-path hole, we zoom the entire
-                        // wallLayer toward the hole center. The clip-path hole stays the
-                        // same radius in local space but grows proportionally in screen
-                        // space as the wall scales up, creating a "fly through" feel.
+                        // Zooms the entire wallLayer toward the hole center immediately
+                        // after the peephole opens — no pause, continuous motion.
 
-                        // Fade paperhole torn-edge overlay quickly — it would look wrong flying
-                        holeOverlay.style.transition = 'opacity 0.35s ease-out';
-                        holeOverlay.style.opacity = '0';
+                        // Fade torn-edge overlay and depth layers now
+                        holeOverlay.style.transition  = 'opacity 0.22s ease-out';
+                        holeOverlay.style.opacity     = '0';
+                        depthLayer.style.transition   = 'opacity 0.28s ease-out';
+                        depthLayer.style.opacity      = '0';
+                        tunnelShadow.style.transition = 'opacity 0.28s ease-out';
+                        tunnelShadow.style.opacity    = '0';
 
-                        // Pre-grow the glow to signal the camera is about to dive
-                        holeGlow.style.transition = 'width 0.5s ease-out, height 0.5s ease-out, opacity 0.5s ease-out';
+                        // Glow pre-surge
+                        holeGlow.style.transition = 'width 0.28s ease-out, height 0.28s ease-out, opacity 0.28s ease-out';
                         holeGlow.style.width   = '340px';
                         holeGlow.style.height  = '340px';
                         holeGlow.style.opacity = '1';
@@ -701,48 +758,45 @@
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
                         wallLayer.style.willChange = 'transform';
 
-                        // Give glow a beat to breathe, then dive
-                        setTimeout(() => {
-                            const phase2Dur   = 1700;
-                            const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
-                            let ts2 = null;
+                        // ── Dive immediately — fist punch flows straight into zoom ──
+                        const phase2Dur   = 1500;
+                        const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
+                        let ts2 = null;
 
-                            function animPhase2(ts) {
-                                if (!ts2) ts2 = ts;
-                                const p = Math.min((ts - ts2) / phase2Dur, 1);
+                        function animPhase2(ts) {
+                            if (!ts2) ts2 = ts;
+                            const p = Math.min((ts - ts2) / phase2Dur, 1);
 
-                                // Cubic ease-in: slow start → rapid lunge forward
-                                const ease = p * p * p;
+                            // Cubic ease-in: slow start → rapid lunge
+                            const ease = p * p * p;
 
-                                // Wall rushes toward viewer — no blur, no parallax
-                                const scale = 1 + ease * (targetScale - 1);
-                                wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
+                            // Wall rushes toward viewer
+                            const scale = 1 + ease * (targetScale - 1);
+                            wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
 
-                                // Glow swells as we approach the light source
-                                const glowSz = 340 + ease * Math.max(W, H) * 2.2;
-                                holeGlow.style.transition = 'none';
-                                holeGlow.style.width  = glowSz + 'px';
-                                holeGlow.style.height = glowSz + 'px';
+                            // Glow swells as we approach the light source
+                            const glowSz = 340 + ease * Math.max(W, H) * 2.2;
+                            holeGlow.style.transition = 'none';
+                            holeGlow.style.width  = glowSz + 'px';
+                            holeGlow.style.height = glowSz + 'px';
 
-                                if (p < 1) {
-                                    requestAnimationFrame(animPhase2);
-                                } else {
-                                    // Snap overlay on in the same frame the zoom lands —
-                                    // no opacity toggle on wallLayer, no timeout, no gap.
-                                    const csOverlay = document.getElementById('comingSoonOverlay');
-                                    csOverlay.style.transition = 'none';
-                                    csOverlay.classList.add('active');
-                                    holeVfx.style.opacity = '0';
-                                    const tb = document.querySelector('.taskbar');
-                                    if (tb) {
-                                        tb.style.transition    = 'none';
-                                        tb.style.opacity       = '0';
-                                        tb.style.pointerEvents = 'none';
-                                    }
+                            if (p < 1) {
+                                requestAnimationFrame(animPhase2);
+                            } else {
+                                // Snap coming-soon overlay on the same frame zoom lands
+                                const csOverlay = document.getElementById('comingSoonOverlay');
+                                csOverlay.style.transition = 'none';
+                                csOverlay.classList.add('active');
+                                holeVfx.style.opacity = '0';
+                                const tb = document.querySelector('.taskbar');
+                                if (tb) {
+                                    tb.style.transition    = 'none';
+                                    tb.style.opacity       = '0';
+                                    tb.style.pointerEvents = 'none';
                                 }
                             }
-                            requestAnimationFrame(animPhase2);
-                        }, 350);
+                        }
+                        requestAnimationFrame(animPhase2);
                     }
 
                 }, 290);
