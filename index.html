@@ -284,7 +284,7 @@
         .spray-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; pointer-events: none; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 60; }
         .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
-        .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
+        .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; background-position: center 25%; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
         .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
         .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
         .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; animation-delay: 0s; }
@@ -509,8 +509,6 @@
 
             <!-- Scene 1: Wall (gets clip-path hole punched through it) -->
             <div id="wallLayer">
-                <div class="vhs-overlay"></div>
-                <div class="vhs-noise"></div>
                 <div class="wall-bg"></div>
                 <div class="neon-strip top"></div>
                 <div class="neon-strip bottom"></div>
