@@ -759,7 +759,7 @@
                         wallLayer.style.willChange = 'transform';
 
                         // ── Dive immediately — fist punch flows straight into zoom ──
-                        const phase2Dur   = 1500;
+                        const phase2Dur   = 1800;
                         const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
                         let ts2 = null;
 
@@ -826,8 +826,8 @@
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
 
-                        // Trigger punch after spray completes (~4.5s)
-                        setTimeout(triggerPunchSequence, 4500);
+                        // Trigger punch ~1s after spray completes (spray ends ~4.3s)
+                        setTimeout(triggerPunchSequence, 5400);
                     } else {
                         throw new Error('Server error');
                     }
