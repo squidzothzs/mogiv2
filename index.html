@@ -701,13 +701,12 @@
 
                         // Aim the zoom pivot exactly at the hole center
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
-                        wallLayer.style.willChange = 'transform, filter';
+                        wallLayer.style.willChange = 'transform';
 
                         // Give glow a beat to breathe, then dive
                         setTimeout(() => {
-                            const phase2Dur   = 1700; // ms — shorter = more impact
+                            const phase2Dur   = 1700;
                             const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
-                            const comingSoon  = document.getElementById('comingSoonScene');
                             let ts2 = null;
 
                             function animPhase2(ts) {
@@ -717,19 +716,9 @@
                                 // Cubic ease-in: slow start → rapid lunge forward
                                 const ease = p * p * p;
 
-                                // Wall rushes toward viewer
+                                // Wall rushes toward viewer — no blur, no parallax
                                 const scale = 1 + ease * (targetScale - 1);
                                 wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
-
-                                // Motion blur tied to instantaneous velocity (d/dp of p^3 = 3p^2)
-                                const velocity = 3 * p * p;
-                                const blur = velocity * 5;
-                                wallLayer.style.filter = blur > 0.3 ? 'blur(' + blur.toFixed(2) + 'px)' : '';
-
-                                // Coming-soon scene zooms toward viewer at slower rate (parallax)
-                                const bgScale = 1 + ease * 0.35;
-                                comingSoon.style.transform = 'scale(' + bgScale.toFixed(4) + ')';
-                                comingSoon.style.transformOrigin = cx + 'px ' + cy + 'px';
 
                                 // Glow swells as we approach the light source
                                 const glowSz = 340 + ease * Math.max(W, H) * 2.2;
