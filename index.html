@@ -75,8 +75,10 @@
         .task-tab.visible { opacity: 1; }
         .task-tab img { width: 14px; height: 14px; }
 
-        /* IE POPUP CSS REMOVED — chrome stripped */
-        .retro-popup-unused {
+        /* =========================================
+           IE POPUP
+           ========================================= */
+        .retro-popup {
             position: fixed; top: 50%; left: 50%;
             width: min(90vw, 600px); height: min(60vh, 450px);
             transform: translate(-50%, -50%) scale(0); opacity: 0;
@@ -91,15 +93,9 @@
         .retro-popup.pop-in { opacity: 1; transform: translate(-50%, -50%) scale(1); }
         .retro-popup.fullscreen {
             top: 0 !important; left: 0 !important;
-            width: 100% !important; height: 100% !important;
+            width: 100% !important; height: calc(100% - 30px) !important;
             transform: translate(0, 0) scale(1) !important;
             border-width: 0px; border-radius: 0px; opacity: 1;
-        }
-        .retro-popup.fullscreen .title-bar,
-        .retro-popup.fullscreen .ie-toolbar,
-        .retro-popup.fullscreen .ie-address-bar {
-            opacity: 0; pointer-events: none;
-            transition: opacity 0.4s ease-out;
         }
         .title-bar {
             background: linear-gradient(to right, #1a3a6e 0%, #2e6ab8 60%, #1a4a8e 100%);
@@ -142,7 +138,7 @@
            WINDOW BODY
            ========================================= */
         .window-body {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            flex-grow: 1; position: relative; width: 100%; height: 100%;
             overflow: hidden; font-family: 'Courier Prime', monospace; cursor: crosshair;
         }
 
@@ -222,8 +218,9 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             background-color: #1a1a1a;
             background-image: url('assets/wall-bg.jpg');
-            background-size: 160%; background-position: center; background-repeat: no-repeat;
+            background-size: cover; background-position: center;
             opacity: 1; z-index: 1;
+            filter: sepia(0.4) contrast(1.15) saturate(0.75) hue-rotate(-8deg);
         }
         .neon-strip { position: absolute; pointer-events: none; z-index: 4; }
         .neon-strip.top {
@@ -240,7 +237,7 @@
             z-index: 5; pointer-events: none;
             display: flex; flex-direction: column; align-items: center; gap: 4px;
         }
-        .brand-ghost img { width: 340px; opacity: 0.18; filter: grayscale(1) brightness(2); }
+        .brand-ghost img { width: 225px; opacity: 0.18; filter: grayscale(1) brightness(2); }
         .brand-ghost .brand-tagline { font-family: 'Courier Prime', monospace; font-size: 9px; color: rgba(255,180,80,0.3); letter-spacing: 3px; text-transform: uppercase; }
 
         /* =========================================
@@ -289,10 +286,9 @@
         .mogi-logo { width: 100%; max-width: 1500px; transform: scale(1) rotate(-2deg); opacity: 0; filter: blur(15px); position: absolute; z-index: 100; }
         .spray-can { position: absolute; width: 180px; z-index: 150; opacity: 0; pointer-events: none; transform: translate(200px, 200px); filter: drop-shadow(10px 20px 15px rgba(0,0,0,0.6)); }
         .spray-splatter { position: absolute; width: 100%; height: 100%; background-image: url('assets/spray-effect.png'); background-size: cover; mix-blend-mode: multiply; opacity: 0; z-index: 10; }
-        /* Desktop: all spray animations together */
+        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.3s; }
+        .spray-active .spray-splatter { animation: spraySplatterAnim 4s ease-out forwards; animation-delay: 0.3s; }
         .spray-active .spray-can { animation: sprayCanAnim 3s ease-in-out forwards; }
-        .spray-active .spray-splatter { animation: spraySplatterAnim 3.2s ease-out forwards; animation-delay: 0s; }
-        .spray-active .mogi-logo { animation: fadeInProgressive 1.5s ease-out forwards; animation-delay: 0.2s; }
         @keyframes sprayCanAnim {
             0%   { opacity:0; transform:translate(300px,-200px) rotate(-20deg); }
             10%  { opacity:1; transform:translate(150px,-150px) rotate(-15deg); }
@@ -307,16 +303,6 @@
         }
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
-        @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(60px,-60px) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(30px,-30px) rotate(-15deg); }
-            25%  { transform:translate(-50px,-10px) rotate(-10deg); }
-            40%  { transform:translate(40px,20px) rotate(-15deg); }
-            55%  { transform:translate(-30px,50px) rotate(-10deg); }
-            70%  { transform:translate(40px,90px) rotate(-5deg); }
-            85%  { opacity:1; transform:translate(60px,140px) rotate(10deg); }
-            100% { opacity:0; transform:translate(100px,200px) rotate(20deg); }
-        }
 
         /* Hand */
         .hand-overlay { position: absolute; top:50%; left:50%; width:600px; height:600px; margin-top:-300px; margin-left:-300px; pointer-events:none; z-index:50; opacity:0; transform:scale(2) translateY(150%); }
@@ -400,7 +386,6 @@
            MOBILE
            ========================================= */
         @media (max-width: 600px) {
-            /* Taskbar */
             .start-button { font-size: 12px; padding: 0 8px 0 5px; }
             .start-button svg { width: 14px; height: 14px; }
             .system-tray { font-size: 10px; padding: 0 8px; gap: 4px; }
@@ -409,48 +394,24 @@
             .ie-toolbar span:not(:first-child):not(:nth-child(2)) { display: none; }
             .ie-toolbar { gap: 8px; font-size: 10px; }
             .address-input { font-size: 10px; padding: 2px 4px; }
-
-            /* Memo note — fills screen width, scaled up, truly centered */
-            .memo-wrapper {
-                width: 220%;
-                left: -60%;          /* (220-100)/2 = 60% pushes it centered */
-                top: 50%;
-                margin-top: calc(-220vw / 3.556);  /* half height (aspect 2063:1160 ≈ 1.778, so height=width/1.778) */
-            }
-
-            /* Content box aligned to note's writable zone */
-            .memo {
-                top: 24%; bottom: 20%;
-                left: 28%; right: 28%;
-                overflow: visible;
-            }
-
-            /* Typography — readable */
-            .title     { font-size: 0.72rem; }
-            .title-zh  { font-size: 0.52rem; margin-bottom: 2px; }
-            .intro     { font-size: 0.62rem; margin-bottom: 3px; }
-            .body-text { font-size: 0.54rem; line-height: 1.3; margin-bottom: 3px; }
-            .body-text-zh { font-size: 0.48rem; margin-bottom: 3px; }
-            .separator { margin: 2px 0; font-size: 0.5rem; letter-spacing: -1px; }
-
-            /* Form — compact but usable */
-            form { gap: 4px; width: 85%; }
-            .input-group { padding: 2px; border-width: 1px; width: 100%; max-width: 100%; }
-            input[type="email"] { font-size: 0.62rem; }
-            button { padding: 5px 4px; font-size: 0.62rem; width: 100%; max-width: 100%; min-height: 30px; }
-
-            /* Misc */
-            .brand-ghost img { width: 200px; }
+            .memo-wrapper { width: 160%; flex-shrink: 0; }
+            .memo { top: 15%; bottom: 15%; left: 12%; right: 12%; }
+            .title { font-size: 0.8rem; }
+            .title-zh { font-size: 0.55rem; margin-bottom: 4px; }
+            .intro { font-size: 0.68rem; margin-bottom: 4px; }
+            .body-text { font-size: 0.65rem; line-height: 1.3; margin-bottom: 3px; }
+            .body-text-zh { font-size: 0.55rem; margin-bottom: 5px; }
+            .separator { margin: 3px 0; font-size: 0.6rem; letter-spacing: -1.5px; }
+            form { gap: 5px; width: 82%; }
+            .input-group { padding: 3px; border-width: 1.5px; width: 100%; max-width: 100%; }
+            button { padding: 8px 4px; font-size: 0.7rem; width: 100%; max-width: 100%; min-height: 40px; }
+            .brand-ghost img { width: 165px; }
             .brand-ghost .brand-tagline { font-size: 7px; }
-            .spray-can { width: 90px; }
-            .mogi-logo { max-width: 1200px; overflow: visible; }
-            /* Mobile: spray sequence — can first, logo fades in mid-spray, then punch */
-            .spray-active .spray-can { animation: sprayCanAnimMobile 3.2s ease-in-out forwards; }
-            .spray-active .spray-splatter { animation: spraySplatterAnim 2s ease-out forwards; animation-delay: 1.4s; }
-            .spray-active .mogi-logo { animation: fadeInProgressive 1.6s ease-out forwards; animation-delay: 1.8s; }
-            .hand-overlay { width: 240px; height: 240px; margin-top: -120px; margin-left: -120px; }
+            .spray-can { width: 100px; }
+            .mogi-logo { max-width: 870px; }
+            .hand-overlay { width: 260px; height: 260px; margin-top: -130px; margin-left: -130px; }
             .play-anim .hand-overlay { animation: mobileHandSlap 0.8s cubic-bezier(0.4,0,0.2,1) forwards; animation-delay: 0.2s; will-change: transform; }
-            #punchFist { width: clamp(130px, 42vw, 200px); height: clamp(130px, 42vw, 200px); }
+            #punchFist { width: clamp(140px, 45vw, 220px); height: clamp(140px, 45vw, 220px); }
         }
         @keyframes mobileHandSlap {
             0%   { transform:scale(1.5) translateY(800px); opacity:0; }
@@ -460,39 +421,54 @@
             100% { transform:scale(0.8) translateY(800px); opacity:0; }
         }
         @media (max-width: 380px) {
-            .memo-wrapper { width: 240%; left: -70%; margin-top: calc(-240vw / 3.556); }
-            .title     { font-size: 0.65rem; }
-            .intro     { font-size: 0.55rem; }
-            .body-text { font-size: 0.48rem; }
-            button     { font-size: 0.55rem; min-height: 26px; }
+            .memo-wrapper { width: 185%; }
+            .title { font-size: 0.8rem; }
+            .intro { font-size: 0.7rem; }
+            .body-text { font-size: 0.65rem; }
+            button { font-size: 0.65rem; min-height: 38px; }
         }
-
-        /* =========================================
-           FULLSCREEN COMING SOON OVERLAY
-           Sits above everything — position:fixed z-index 9999
-           covers taskbar, IE chrome, and all windows
-           ========================================= */
-        #comingSoonOverlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 9999;
-            background: radial-gradient(ellipse at center, #150a03 0%, #060302 100%);
-            display: flex; flex-direction: column;
-            justify-content: center; align-items: center;
-            opacity: 0; pointer-events: none;
-            transition: opacity 1.2s ease-in;
-        }
-        #comingSoonOverlay.active {
-            opacity: 1; pointer-events: all;
-        }
-        #comingSoonOverlay .cs-vhs-overlay { z-index: 2; }
-        #comingSoonOverlay .cs-vhs-noise   { z-index: 3; }
-        #comingSoonOverlay .cs-content     { z-index: 10; }
     </style>
 </head>
 <body>
 
-    <div class="window-body" id="appBody">
+    <!-- Desktop -->
+    <div class="desktop-environment">
+        <div class="desktop-icons">
+            <div class="icon-wrapper">
+                <svg viewBox="0 0 64 64"><rect x="8" y="12" width="48" height="32" rx="2" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="12" y="16" width="40" height="24" fill="#000080"/><path d="M28 44 L36 44 L40 52 L24 52 Z" fill="#d4d0c8" stroke="#fff" stroke-width="1"/><rect x="20" y="52" width="24" height="4" fill="#a0a0a0"/></svg>
+                <span>My Computer</span>
+            </div>
+            <div class="icon-wrapper">
+                <img src="assets/internet-icon.png" alt="mogi.exe">
+                <span>mogi.exe</span>
+                <span class="zh">摩奇</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- IE Popup -->
+    <div class="retro-popup" id="ieWindow">
+        <div class="title-bar">
+            <div class="title-bar-text">
+                <img src="assets/internet-icon.png" alt="ie logo">
+                網頁瀏覽器 — MOGI Archive
+                <span class="zh-title">/ 候補名單</span>
+            </div>
+            <div class="title-bar-controls">
+                <div class="control-btn">_</div>
+                <div class="control-btn">□</div>
+                <div class="control-btn close-btn">X</div>
+            </div>
+        </div>
+        <div class="ie-toolbar">
+            <span>File</span><span>Edit</span><span>View</span><span>Favorites</span><span>Help</span>
+        </div>
+        <div class="ie-address-bar">
+            <span>Address</span>
+            <div class="address-input">http://mogi-archive.hk/候補名單_v1.0</div>
+        </div>
+
+        <div class="window-body" id="appBody">
 
             <!-- SVG clip-path def for wall hole -->
             <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
@@ -543,10 +519,10 @@
                             <div class="separator">————————————————————————————</div>
                             <form id="archiveForm">
                                 <div class="input-group">
-                                    <input type="email" id="emailInput" placeholder="[ EMAIL ]" required autocomplete="off">
+                                    <input type="email" id="emailInput" placeholder="[ ENTER YOUR EMAIL ]" required autocomplete="off">
                                 </div>
                                 <div class="form-error" id="formError">CONNECTION FAILED. TRY AGAIN.</div>
-                                <button type="submit" id="submitBtn">[ ARCHIVE ]</button>
+                                <button type="submit" id="submitBtn">[ENTER THE ARCHIVE]</button>
                             </form>
                         </div>
                     </div>
@@ -568,15 +544,36 @@
             <div id="punchFist"><img src="assets/fist.png" alt="fist"></div>
 
         </div>
+    </div>
+
+    <!-- Taskbar -->
+    <div class="taskbar">
+        <div class="start-button">
+            <svg viewBox="0 0 24 24"><path d="M0,3.4l10-1.4v9.6H0V3.4z M11,1.8l13-1.8v11.6H11V1.8z M0,12.5h10v9.6L0,20.6V12.5z M11,12.5h13v11.6l-13-1.8V12.5z"/></svg>
+            開始
+        </div>
+        <div class="taskbar-tasks">
+            <div class="task-tab" id="taskbarTab">
+                <img src="assets/internet-icon.png" alt="ie icon">
+                <span>網頁瀏覽器</span>
+            </div>
+        </div>
+        <div class="system-tray">
+            <span class="tray-city">HKT</span>
+            <span id="clock">--:-- --</span>
+        </div>
+    </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const ieWindow     = document.getElementById('ieWindow');
             const appBody      = document.getElementById('appBody');
             const wallLayer    = document.getElementById('wallLayer');
             const form         = document.getElementById('archiveForm');
             const sprayOverlay = document.getElementById('sprayOverlay');
             const submitBtn    = document.getElementById('submitBtn');
             const emailInput   = document.getElementById('emailInput');
+            const taskbarTab   = document.getElementById('taskbarTab');
             const formError    = document.getElementById('formError');
             const punchFist    = document.getElementById('punchFist');
             const holeVfx      = document.getElementById('holeVfx');
@@ -584,8 +581,31 @@
             const holeClipPath = document.getElementById('holeClipPath');
             const holeOverlay  = document.getElementById('holeOverlay');
 
-            // Start memo slap
-            setTimeout(() => { appBody.classList.add('play-anim'); }, 1800);
+            // ── Live HKT clock ──────────────────────────────
+            function updateClock() {
+                const now = new Date();
+                const hkt = new Date(now.getTime() + (8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000));
+                let h = hkt.getUTCHours();
+                const m = String(hkt.getUTCMinutes()).padStart(2, '0');
+                const ampm = h >= 12 ? 'PM' : 'AM';
+                h = h % 12 || 12;
+                document.getElementById('clock').textContent = `${h}:${m} ${ampm}`;
+            }
+            updateClock();
+            setInterval(updateClock, 30000);
+
+            // ── Popup sequence ──────────────────────────────
+            setTimeout(() => {
+                ieWindow.classList.add('pop-in');
+                taskbarTab.classList.add('visible');
+            }, 800);
+            setTimeout(() => { ieWindow.classList.add('fullscreen'); }, 2000);
+            ieWindow.addEventListener('transitionend', function handler(e) {
+                if ((e.propertyName === 'top' || e.propertyName === 'width') && ieWindow.classList.contains('fullscreen')) {
+                    setTimeout(() => { appBody.classList.add('play-anim'); }, 800);
+                    ieWindow.removeEventListener('transitionend', handler);
+                }
+            });
 
             // ── Hole helpers ─────────────────────────────────
             const N_PTS = 28;
@@ -712,15 +732,12 @@
                                 holeVfx.style.opacity = '0';
                                 holeOverlay.style.transition = 'opacity 0.5s ease-out';
                                 holeOverlay.style.opacity = '0';
-                                // Transition: full-viewport coming soon covers everything
+                                // Transition to fullscreen coming soon
                                 setTimeout(() => {
-                                    const csOverlay = document.getElementById('comingSoonOverlay');
-                                    csOverlay.classList.add('active');
-                                    // Also fade out taskbar for belt-and-suspenders
-                                    const tb = document.querySelector('.taskbar');
-                                    tb.style.transition = 'opacity 0.6s ease-out';
-                                    tb.style.opacity = '0';
-                                    tb.style.pointerEvents = 'none';
+                                    ieWindow.classList.add('fullscreen');
+                                    document.querySelector('.taskbar').style.transition = 'opacity 0.6s ease-out';
+                                    document.querySelector('.taskbar').style.opacity = '0';
+                                    document.querySelector('.taskbar').style.pointerEvents = 'none';
                                 }, 500);
                             }
                         }
@@ -754,15 +771,13 @@
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
 
-                        // Mobile: sequenced spray (done at 3.4s), punch at 4.2s
-                        // Desktop: concurrent spray (done at 3.2s), punch at 4.5s
-                        const punchDelay = window.innerWidth <= 600 ? 4200 : 4500;
-                        setTimeout(triggerPunchSequence, punchDelay);
+                        // Trigger punch after spray completes (~4.5s)
+                        setTimeout(triggerPunchSequence, 4500);
                     } else {
                         throw new Error('Server error');
                     }
                 } catch {
-                    submitBtn.textContent = '[ ARCHIVE ]';
+                    submitBtn.textContent = '[ENTER THE ARCHIVE]';
                     submitBtn.disabled = false;
                     emailInput.disabled = false;
                     formError.classList.add('visible');
@@ -770,16 +785,5 @@
             });
         });
     </script>
-
-    <!-- Full-viewport coming soon overlay — z-index 9999, covers taskbar + IE chrome -->
-    <div id="comingSoonOverlay">
-        <div class="cs-vhs-overlay"></div>
-        <div class="cs-vhs-noise"></div>
-        <div class="cs-content">
-            <div class="cs-mogi">MOGI</div>
-            <div class="cs-coming-soon">COMING SOON<span class="cs-blink">_</span></div>
-        </div>
-    </div>
-
 </body>
 </html>
