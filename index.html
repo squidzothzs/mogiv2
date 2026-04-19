@@ -739,21 +739,22 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Brief beat so the viewer can see the hole + depth layers
-                            // before the camera dives — makes the layering feel real
-                            setTimeout(startPhase2, 1000);
+                            // Fist lands — immediately start fading the paper-hole layers
+                            // so the viewer sees them dissolve before the camera dives.
+                            holeOverlay.style.transition  = 'opacity 0.35s ease-out';
+                            holeOverlay.style.opacity     = '0';
+                            depthLayer.style.transition   = 'opacity 0.4s ease-out';
+                            depthLayer.style.opacity      = '0';
+                            tunnelShadow.style.transition = 'opacity 0.4s ease-out';
+                            tunnelShadow.style.opacity    = '0';
+                            // Wait for the fade to finish, then a brief extra beat, then zoom
+                            setTimeout(startPhase2, 750);
                         }
                     }
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        // Fade torn-edge overlay and depth layers
-                        holeOverlay.style.transition  = 'opacity 0.22s ease-out';
-                        holeOverlay.style.opacity     = '0';
-                        depthLayer.style.transition   = 'opacity 0.28s ease-out';
-                        depthLayer.style.opacity      = '0';
-                        tunnelShadow.style.transition = 'opacity 0.28s ease-out';
-                        tunnelShadow.style.opacity    = '0';
+                        // Paper-hole layers already faded — jump straight into zoom
 
                         // ── Performance: hide only the fully-done animated elements ──
                         // Keep memo + mogi logo visible during zoom.
@@ -834,10 +835,6 @@
                                 // already fully visible. Just freeze it here; no overlay snap.
                                 wallLayer.style.opacity = '0';
                                 holeVfx.style.opacity   = '0';
-
-                                // Settle glow to ~50% — keeps warmth without blowing out
-                                holeGlow.style.transition = 'opacity 0.6s ease-out';
-                                holeGlow.style.opacity    = '0.5';
 
                                 // Ease cs-content back to natural scale (was 1.04 → 1.0)
                                 if (csContent) {
