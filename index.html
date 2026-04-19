@@ -755,22 +755,25 @@
                         tunnelShadow.style.transition = 'opacity 0.28s ease-out';
                         tunnelShadow.style.opacity    = '0';
 
-                        // ── True camera-POV zoom ──────────────────────────────────────
-                        // Instead of expanding the hole, we scale wallLayer toward the
-                        // viewer (camera moving forward). The wall rushes at you, the hole
-                        // grows in screen-space naturally as the wall gets closer.
-                        //
-                        // We switch from SVG clip-path (forces CPU raster on scale) to a
-                        // CSS mask radial-gradient. mask: transparent inside = hole, black
-                        // outside = wall — correct direction. CSS mask IS GPU-composited
-                        // with will-change:transform so no lag.
-                        const maskVal =
-                            'radial-gradient(circle ' + peepR + 'px at ' + cx + 'px ' + cy + 'px, ' +
-                            'transparent ' + peepR + 'px, black ' + peepR + 'px)';
-                        wallLayer.style.clipPath     = 'none';
-                        wallLayer.style.webkitMask   = maskVal;
-                        wallLayer.style.mask         = maskVal;
-                        wallLayer.style.willChange   = 'transform';
+                        // ── Performance: strip heavy content from wallLayer before zoom ──
+                        // The memo/form/scene is a massive GPU texture at 10x scale.
+                        // It's no longer needed — hide it so the scaled layer is just
+                        // the wall background + hole, which is cheap to rasterize.
+                        const scene = document.getElementById('scene');
+                        if (scene) scene.style.display = 'none';
+
+                        // ── Camera-POV zoom with jagged hole ─────────────────────────
+                        // Switch from clip-path:url() (SVG ref — CPU-only, can't composite
+                        // with transform) to clip-path:path(evenodd,'...') (CSS-native path
+                        // — GPU-composited alongside will-change:transform).
+                        // Same jagged hole points as phase 1, correct evenodd fill rule:
+                        // outer rect = wall visible, inner jagged = hole transparent.
+                        const jaggedPath = buildHolePath(cx, cy, peepR, W, H);
+                        wallLayer.style.clipPath        = "path(evenodd, '" + jaggedPath + "')";
+                        wallLayer.style.webkitClipPath  = "path(evenodd, '" + jaggedPath + "')";
+                        wallLayer.style.mask            = 'none';
+                        wallLayer.style.webkitMask      = 'none';
+                        wallLayer.style.willChange      = 'transform';
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
 
                         const glowBase    = 340;
