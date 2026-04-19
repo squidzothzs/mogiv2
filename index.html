@@ -784,9 +784,7 @@
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        // Fade paper hole overlay out as zoom begins
-                        holeOverlay.style.transition = 'opacity 0.22s ease-out';
-                        holeOverlay.style.opacity    = '0';
+                        // Keep paper hole overlay visible — it will scale with the zoom
 
                         // ── Performance: hide only the fully-done animated elements ──
                         // Keep memo + mogi logo visible during zoom.
@@ -855,6 +853,8 @@
                             // Wall rushes at camera — hole grows proportionally in screen space
                             const scale = 1 + ease * (targetScale - 1);
                             wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
+                            // Paper hole overlay scales in sync with the wall zoom
+                            holeOverlay.style.transform = 'translate(-50%,-50%) scale(' + scale.toFixed(4) + ')';
 
                             // ComingSoon content parallax: scene rushes up as camera dives
                             if (csContent) {
