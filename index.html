@@ -733,12 +733,19 @@
                         const p    = Math.min((ts - startTs) / phase1Dur, 1);
                         const ease = 1 - Math.pow(1 - p, 3);
                         const r    = 5 + (peepR - 5) * ease;
-                        setHole(cx, cy, r, W, H);
+
+                        // Only update the SVG clip path and glow per frame — skip
+                        // depthLayer/tunnelShadow/holeOverlay to avoid layout+paint every tick.
+                        holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
                         holeGlow.style.width  = (r * 2.4) + 'px';
                         holeGlow.style.height = (r * 2.4) + 'px';
+
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
+                            // Settle depth layers at final peephole size (single paint, not per-frame)
+                            setHole(cx, cy, peepR, W, H);
+
                             // Fist lands — immediately start fading the paper-hole layers
                             // so the viewer sees them dissolve before the camera dives.
                             holeOverlay.style.transition  = 'opacity 0.35s ease-out';
@@ -747,7 +754,7 @@
                             depthLayer.style.opacity      = '0';
                             tunnelShadow.style.transition = 'opacity 0.4s ease-out';
                             tunnelShadow.style.opacity    = '0';
-                            // ~400ms for fade to finish + 1s clean pause, then zoom
+                            // ~400ms for fade to finish + brief beat, then zoom
                             setTimeout(startPhase2, 1400);
                         }
                     }
@@ -765,6 +772,11 @@
                         if (sprayCan)    sprayCan.style.display    = 'none';
                         if (handOverlay) handOverlay.style.display  = 'none';
                         if (formEl)      formEl.style.display       = 'none';
+
+                        // mix-blend-mode on any descendant prevents GPU layer promotion
+                        // of wallLayer even when the element is invisible — kill it.
+                        const spraySplatter = document.querySelector('.spray-splatter');
+                        if (spraySplatter) spraySplatter.style.mixBlendMode = 'normal';
 
                         // ── GPU unlock: strip CSS filters that block compositing ──────
                         // CSS filters (esp. drop-shadow) on children of a will-change:transform
