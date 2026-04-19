@@ -755,12 +755,15 @@
                         tunnelShadow.style.transition = 'opacity 0.28s ease-out';
                         tunnelShadow.style.opacity    = '0';
 
-                        // ── Performance: strip heavy content from wallLayer before zoom ──
-                        // The memo/form/scene is a massive GPU texture at 10x scale.
-                        // It's no longer needed — hide it so the scaled layer is just
-                        // the wall background + hole, which is cheap to rasterize.
-                        const scene = document.getElementById('scene');
-                        if (scene) scene.style.display = 'none';
+                        // ── Performance: hide only the fully-done animated elements ──
+                        // Keep memo + mogi logo visible during zoom.
+                        // Hide spray can, hand, and form controls (done, not needed).
+                        const sprayCan   = document.getElementById('sprayCan');
+                        const handOverlay = document.querySelector('.hand-overlay');
+                        const formEl     = document.getElementById('archiveForm');
+                        if (sprayCan)    sprayCan.style.display    = 'none';
+                        if (handOverlay) handOverlay.style.display  = 'none';
+                        if (formEl)      formEl.style.display       = 'none';
 
                         // ── Camera-POV zoom with jagged hole ─────────────────────────
                         // Switch from clip-path:url() (SVG ref — CPU-only, can't composite
