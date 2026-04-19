@@ -729,20 +729,6 @@
                 const cx = W / 2;
                 const cy = H / 2;
 
-                // ── GPU promotion: set willChange + strip compositor-killing filters NOW
-                //    so the browser has the full punch duration (~750ms) to promote
-                //    wallLayer to a GPU compositing layer before the zoom starts.
-                wallLayer.style.willChange      = 'transform';
-                wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
-                const _memoEarly = document.querySelector('.memo-base-img');
-                if (_memoEarly) _memoEarly.style.filter = 'sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg)';
-                const _ghostEarly = document.querySelector('.brand-ghost img');
-                if (_ghostEarly) _ghostEarly.style.filter = 'none';
-                const _logoEarly = document.getElementById('mogiLogo');
-                if (_logoEarly) _logoEarly.style.filter = 'none';
-                const _splatterEarly = document.querySelector('.spray-splatter');
-                if (_splatterEarly) _splatterEarly.style.mixBlendMode = 'normal';
-
                 // Show fist, centered
                 punchFist.style.left = cx + 'px';
                 punchFist.style.top  = cy + 'px';
@@ -791,71 +777,112 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // DOM cleanup: hide finished elements DURING the 600ms pause so
-                            // the repaint settles before the zoom rAF loop begins.
-                            const _sc = document.getElementById('sprayCan');
-                            const _ho = document.querySelector('.hand-overlay');
-                            const _fe = document.getElementById('archiveForm');
-                            if (_sc) _sc.style.display = 'none';
-                            if (_ho) _ho.style.display = 'none';
-                            if (_fe) _fe.style.display  = 'none';
+                            // No paper hole effect — brief beat then zoom
                             setTimeout(startPhase2, 600);
                         }
                     }
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        // Fade paper hole overlay as zoom begins
+                        // Fade paper hole overlay out as zoom begins
                         holeOverlay.style.transition = 'opacity 0.22s ease-out';
                         holeOverlay.style.opacity    = '0';
+                        // Keep paper hole overlay visible — it will scale with the zoom
 
-                        // ── Switch to CSS-native path() for GPU-composited clipping ──
-                        // url(#svgRef) is CPU-only; path() composites with will-change:transform.
+                        // ── Performance: hide only the fully-done animated elements ──
+                        // Keep memo + mogi logo visible during zoom.
+                        // Hide spray can, hand, and form controls (done, not needed).
+                        const sprayCan   = document.getElementById('sprayCan');
+                        const handOverlay = document.querySelector('.hand-overlay');
+                        const formEl     = document.getElementById('archiveForm');
+                        if (sprayCan)    sprayCan.style.display    = 'none';
+                        if (handOverlay) handOverlay.style.display  = 'none';
+                        if (formEl)      formEl.style.display       = 'none';
+
+                        // mix-blend-mode on any descendant prevents GPU layer promotion
+                        // of wallLayer even when the element is invisible — kill it.
+                        const spraySplatter = document.querySelector('.spray-splatter');
+                        if (spraySplatter) spraySplatter.style.mixBlendMode = 'normal';
+
+                        // ── GPU unlock: strip CSS filters that block compositing ──────
+                        // CSS filters (esp. drop-shadow) on children of a will-change:transform
+                        // element force the browser to CPU re-rasterize every frame.
+                        // Removing them lets wallLayer stay on its own GPU compositing layer.
+                        const memoImg = document.querySelector('.memo-base-img');
+                        if (memoImg) {
+                            // Keep colour grading; drop-shadow is the expensive compositor-breaking filter
+                            memoImg.style.filter = 'sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg)';
+                        }
+                        const brandGhostImg = document.querySelector('.brand-ghost img');
+                        if (brandGhostImg) brandGhostImg.style.filter = 'none';
+                        const mogiLogoEl = document.getElementById('mogiLogo');
+                        if (mogiLogoEl) mogiLogoEl.style.filter = 'none';
+
+                        // ── Camera-POV zoom with jagged hole ─────────────────────────
+                        // Switch from clip-path:url() (SVG ref — CPU-only, can't composite
+                        // with transform) to clip-path:path(evenodd,'...') (CSS-native path
+                        // — GPU-composited alongside will-change:transform).
+                        // Same jagged hole points as phase 1, correct evenodd fill rule:
+                        // outer rect = wall visible, inner jagged = hole transparent.
                         const jaggedPath = buildHolePath(cx, cy, peepR, W, H);
-                        wallLayer.style.clipPath       = "path(evenodd, '" + jaggedPath + "')";
-                        wallLayer.style.webkitClipPath = "path(evenodd, '" + jaggedPath + "')";
-                        wallLayer.style.mask           = 'none';
-                        wallLayer.style.webkitMask     = 'none';
+                        wallLayer.style.clipPath        = "path(evenodd, '" + jaggedPath + "')";
+                        wallLayer.style.webkitClipPath  = "path(evenodd, '" + jaggedPath + "')";
+                        wallLayer.style.mask            = 'none';
+                        wallLayer.style.webkitMask      = 'none';
+                        wallLayer.style.willChange      = 'transform';
+                        wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
 
-                        const glowBase      = 340;
+                        // glowBase as a scale multiplier relative to the fixed 260px element
+                        const glowBase    = 340;
                         const glowBaseScale = glowBase / 260;
                         holeGlow.style.transition = 'none';
-                        holeGlow.style.transform  = 'translate(-50%,-50%) scale(' + glowBaseScale.toFixed(4) + ')';
-                        holeGlow.style.opacity    = '1';
+                        holeGlow.style.transform = 'translate(-50%,-50%) scale(' + glowBaseScale.toFixed(4) + ')';
+                        holeGlow.style.opacity = '1';
 
                         const phase2Dur   = 1700;
+                        // Scale until the mask hole (peepR × scale) covers full diagonal
                         const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.08;
                         const glowMax     = 2 + (Math.max(W, H) * 2.4) / glowBase;
                         const csContent   = document.querySelector('#comingSoonScene .cs-content');
                         let ts2 = null;
 
-                        // ── Double-rAF warmup ────────────────────────────────────────
-                        // Two full frames for the browser to commit the clip-path switch
-                        // and confirm the GPU layer before the zoom loop starts.
-                        requestAnimationFrame(() => { requestAnimationFrame(() => {
-
                         function animPhase2(ts) {
                             if (!ts2) ts2 = ts;
                             const p    = Math.min((ts - ts2) / phase2Dur, 1);
+
+                            // Cubic ease-in: slow start → rapid lunge (camera accelerates)
                             const ease = p * p * p;
+
+                            // Wall rushes at camera — hole grows proportionally in screen space
                             const scale = 1 + ease * (targetScale - 1);
                             wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
+                            // Paper hole overlay scales in sync with the wall zoom
                             holeOverlay.style.transform = 'translate(-50%,-50%) scale(' + scale.toFixed(4) + ')';
+
+                            // ComingSoon content parallax: scene rushes up as camera dives
                             if (csContent) {
                                 const cs = 0.72 + ease * 0.32;
                                 csContent.style.transform = 'scale(' + cs.toFixed(4) + ')';
                             }
+
+                            // Glow swells — transform only, no layout
                             const gs = glowBaseScale + ease * glowMax;
                             holeGlow.style.transform = 'translate(-50%,-50%) scale(' + gs.toFixed(4) + ')';
+
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
                             } else {
+                                // Hole now covers the entire screen — comingSoonScene is
+                                // already fully visible. Just freeze it here; no overlay snap.
                                 wallLayer.style.opacity = '0';
                                 holeVfx.style.opacity   = '0';
+
+                                // Ease cs-content back to natural scale (was 1.04 → 1.0)
                                 if (csContent) {
                                     csContent.style.transition = 'transform 0.5s ease-out';
                                     csContent.style.transform  = 'scale(1.0)';
                                 }
+
                                 const tb = document.querySelector('.taskbar');
                                 if (tb) {
                                     tb.style.transition    = 'none';
@@ -865,7 +892,6 @@
                             }
                         }
                         requestAnimationFrame(animPhase2);
-                        }); }); // end double-rAF warmup
                     }
 
                 }, 160);
