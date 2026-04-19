@@ -796,20 +796,23 @@
                         if (handOverlay) handOverlay.style.display  = 'none';
                         if (formEl)      formEl.style.display       = 'none';
 
-                        // mix-blend-mode on any descendant prevents GPU layer promotion
-                        // of wallLayer even when the element is invisible — kill it.
+                        // ── Kill all compositor-breaking CSS on animated subtrees ──
+                        // ANY mix-blend-mode or CSS filter on a descendant of a scaling
+                        // element forces CPU rasterization every frame. Strip them all.
                         const spraySplatter = document.querySelector('.spray-splatter');
                         if (spraySplatter) spraySplatter.style.mixBlendMode = 'normal';
-
-                        // ── GPU unlock: strip CSS filters that block compositing ──────
-                        // CSS filters (esp. drop-shadow) on children of a will-change:transform
-                        // element force the browser to CPU re-rasterize every frame.
-                        // Removing them lets wallLayer stay on its own GPU compositing layer.
+                        // Paper hole overlay — was mix-blend-mode:screen; kills compositing
+                        // as it scales up to cover the viewport. Switch to plain opacity.
+                        holeOverlay.style.mixBlendMode = 'normal';
+                        // Neon strips inside wallLayer — thin but have box-shadow that repaints
+                        document.querySelectorAll('.neon-strip').forEach(s => s.style.display = 'none');
+                        // VHS noise inside csContent — mix-blend-mode:overlay blocks GPU on zoom
+                        const vhsNoise = document.querySelector('#comingSoonScene .vhs-noise, #comingSoonScene .cs-vhs-noise');
+                        if (vhsNoise) vhsNoise.style.mixBlendMode = 'normal';
+                        // Memo filter stack (sepia/contrast/saturate/hue-rotate) — any filter
+                        // keeps the element off the GPU layer. Remove entirely during zoom.
                         const memoImg = document.querySelector('.memo-base-img');
-                        if (memoImg) {
-                            // Keep colour grading; drop-shadow is the expensive compositor-breaking filter
-                            memoImg.style.filter = 'sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg)';
-                        }
+                        if (memoImg) memoImg.style.filter = 'none';
                         const brandGhostImg = document.querySelector('.brand-ghost img');
                         if (brandGhostImg) brandGhostImg.style.filter = 'none';
                         const mogiLogoEl = document.getElementById('mogiLogo');
