@@ -201,6 +201,8 @@
         #wallLayer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             z-index: 10;
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
         /* Shared VHS / wall styles */
@@ -412,6 +414,8 @@
         #comingSoonScene .cs-content {
             transform: scale(0.72);
             transform-origin: center center;
+            will-change: transform;
+            backface-visibility: hidden;
         }
 
         /* =========================================
@@ -737,11 +741,7 @@
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        // ── Camera zoom-into-hole ──────────────────────────────────
-                        // Zooms the entire wallLayer toward the hole center immediately
-                        // after the peephole opens — no pause, continuous motion.
-
-                        // Fade torn-edge overlay and depth layers now
+                        // Fade torn-edge overlay and depth layers
                         holeOverlay.style.transition  = 'opacity 0.22s ease-out';
                         holeOverlay.style.opacity     = '0';
                         depthLayer.style.transition   = 'opacity 0.28s ease-out';
@@ -749,19 +749,24 @@
                         tunnelShadow.style.transition = 'opacity 0.28s ease-out';
                         tunnelShadow.style.opacity    = '0';
 
-                        // Glow pre-surge
-                        holeGlow.style.transition = 'width 0.28s ease-out, height 0.28s ease-out, opacity 0.28s ease-out';
-                        holeGlow.style.width   = '340px';
-                        holeGlow.style.height  = '340px';
-                        holeGlow.style.opacity = '1';
+                        // Switch from SVG clip-path (not GPU-composited) to CSS circle
+                        // so the zoom runs entirely on the compositor — no repaint per frame
+                        wallLayer.style.clipPath = 'circle(' + peepR + 'px at ' + cx + 'px ' + cy + 'px)';
 
                         // Aim the zoom pivot exactly at the hole center
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
-                        wallLayer.style.willChange = 'transform';
 
-                        // ── Camera dive after the beat ──
+                        // Size holeGlow once — animate via transform scale only (no layout)
+                        const glowBase = 340;
+                        holeGlow.style.transition = 'none';
+                        holeGlow.style.width   = glowBase + 'px';
+                        holeGlow.style.height  = glowBase + 'px';
+                        holeGlow.style.opacity = '1';
+
+                        // ── Camera dive ──
                         const phase2Dur   = 1800;
                         const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
+                        const glowMax     = 2 + (Math.max(W, H) * 2.2) / glowBase;
                         const csContent   = document.querySelector('#comingSoonScene .cs-content');
                         let ts2 = null;
 
@@ -772,22 +777,19 @@
                             // Cubic ease-in: slow start → rapid lunge
                             const ease = p * p * p;
 
-                            // Wall rushes toward viewer
+                            // Wall rushes toward viewer (GPU compositor handles this)
                             const scale = 1 + ease * (targetScale - 1);
                             wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
 
-                            // Coming-soon content parallax: recessed scene rushes up to meet camera
-                            // Goes from 0.72 (far away, small) → 1.0 (full size) as we fly through
+                            // Coming-soon content parallax: 0.72→1.0 as camera flies through
                             if (csContent) {
-                                const contentScale = 0.72 + ease * 0.28;
-                                csContent.style.transform = 'scale(' + contentScale.toFixed(4) + ')';
+                                const cs = 0.72 + ease * 0.28;
+                                csContent.style.transform = 'scale(' + cs.toFixed(4) + ')';
                             }
 
-                            // Glow swells as we approach the light source
-                            const glowSz = 340 + ease * Math.max(W, H) * 2.2;
-                            holeGlow.style.transition = 'none';
-                            holeGlow.style.width  = glowSz + 'px';
-                            holeGlow.style.height = glowSz + 'px';
+                            // Glow swells via transform only — no width/height thrash
+                            const gs = 1 + ease * glowMax;
+                            holeGlow.style.transform = 'translate(-50%,-50%) scale(' + gs.toFixed(4) + ')';
 
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
