@@ -784,6 +784,9 @@
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
+                        // Fade paper hole overlay out as zoom begins
+                        holeOverlay.style.transition = 'opacity 0.22s ease-out';
+                        holeOverlay.style.opacity    = '0';
                         // Keep paper hole overlay visible — it will scale with the zoom
 
                         // ── Performance: hide only the fully-done animated elements ──
@@ -796,23 +799,20 @@
                         if (handOverlay) handOverlay.style.display  = 'none';
                         if (formEl)      formEl.style.display       = 'none';
 
-                        // ── Kill all compositor-breaking CSS on animated subtrees ──
-                        // ANY mix-blend-mode or CSS filter on a descendant of a scaling
-                        // element forces CPU rasterization every frame. Strip them all.
+                        // mix-blend-mode on any descendant prevents GPU layer promotion
+                        // of wallLayer even when the element is invisible — kill it.
                         const spraySplatter = document.querySelector('.spray-splatter');
                         if (spraySplatter) spraySplatter.style.mixBlendMode = 'normal';
-                        // Paper hole overlay — was mix-blend-mode:screen; kills compositing
-                        // as it scales up to cover the viewport. Switch to plain opacity.
-                        holeOverlay.style.mixBlendMode = 'normal';
-                        // Neon strips inside wallLayer — thin but have box-shadow that repaints
-                        document.querySelectorAll('.neon-strip').forEach(s => s.style.display = 'none');
-                        // VHS noise inside csContent — mix-blend-mode:overlay blocks GPU on zoom
-                        const vhsNoise = document.querySelector('#comingSoonScene .vhs-noise, #comingSoonScene .cs-vhs-noise');
-                        if (vhsNoise) vhsNoise.style.mixBlendMode = 'normal';
-                        // Memo filter stack (sepia/contrast/saturate/hue-rotate) — any filter
-                        // keeps the element off the GPU layer. Remove entirely during zoom.
+
+                        // ── GPU unlock: strip CSS filters that block compositing ──────
+                        // CSS filters (esp. drop-shadow) on children of a will-change:transform
+                        // element force the browser to CPU re-rasterize every frame.
+                        // Removing them lets wallLayer stay on its own GPU compositing layer.
                         const memoImg = document.querySelector('.memo-base-img');
-                        if (memoImg) memoImg.style.filter = 'none';
+                        if (memoImg) {
+                            // Keep colour grading; drop-shadow is the expensive compositor-breaking filter
+                            memoImg.style.filter = 'sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg)';
+                        }
                         const brandGhostImg = document.querySelector('.brand-ghost img');
                         if (brandGhostImg) brandGhostImg.style.filter = 'none';
                         const mogiLogoEl = document.getElementById('mogiLogo');
