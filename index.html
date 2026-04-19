@@ -729,8 +729,9 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Flow directly into zoom — no hold
-                            startPhase2();
+                            // Brief beat so the viewer can see the hole + depth layers
+                            // before the camera dives — makes the layering feel real
+                            setTimeout(startPhase2, 1000);
                         }
                     }
                     requestAnimationFrame(animPhase1);
@@ -758,9 +759,10 @@
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
                         wallLayer.style.willChange = 'transform';
 
-                        // ── Dive immediately — fist punch flows straight into zoom ──
+                        // ── Camera dive after the beat ──
                         const phase2Dur   = 1800;
                         const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.1;
+                        const csContent   = document.querySelector('#comingSoonScene .cs-content');
                         let ts2 = null;
 
                         function animPhase2(ts) {
@@ -773,6 +775,13 @@
                             // Wall rushes toward viewer
                             const scale = 1 + ease * (targetScale - 1);
                             wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
+
+                            // Coming-soon content parallax: recessed scene rushes up to meet camera
+                            // Goes from 0.72 (far away, small) → 1.0 (full size) as we fly through
+                            if (csContent) {
+                                const contentScale = 0.72 + ease * 0.28;
+                                csContent.style.transform = 'scale(' + contentScale.toFixed(4) + ')';
+                            }
 
                             // Glow swells as we approach the light source
                             const glowSz = 340 + ease * Math.max(W, H) * 2.2;
