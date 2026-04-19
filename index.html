@@ -691,7 +691,7 @@
             }
 
             // Pre-decode all animation assets during idle time so no decode stall mid-animation
-            ['assets/spray-effect.png', 'assets/fist.png', 'assets/hand.png'].forEach(src => {
+            ['assets/spray-effect.png', 'assets/fist.png', 'assets/hand.png', 'assets/paperhole.png'].forEach(src => {
                 const img = new Image();
                 img.src = src;
                 if (img.decode) img.decode().catch(() => {});
@@ -745,9 +745,13 @@
                     holeGlow.style.transform = 'translate(-50%,-50%) scale(0.615)';
                     holeGlow.style.opacity   = '1';
 
-                    // Activate clip-path (no paper overlay)
+                    // Activate clip-path + position paper hole overlay
                     wallLayer.style.clipPath = 'url(#wallHoleClip)';
                     holeClipPath.setAttribute('d', buildHolePath(cx, cy, 5, W, H));
+                    holeOverlay.style.left    = cx + 'px';
+                    holeOverlay.style.top     = cy + 'px';
+                    spawnDust(cx, cy);
+                    holeVfx.classList.add('active');
 
                     const peepR = 110;
                     const maxR  = Math.sqrt(W * W + H * H) * 0.82;
@@ -762,10 +766,13 @@
                         const ease = 1 - Math.pow(1 - p, 3);
                         const r    = 5 + (peepR - 5) * ease;
 
-                        // Only update the SVG clip path and glow per frame — skip
-                        // depthLayer/tunnelShadow/holeOverlay to avoid layout+paint every tick.
                         holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
                         holeGlow.style.transform = 'translate(-50%,-50%) scale(' + (r * 2.4 / 260).toFixed(4) + ')';
+                        // Paper hole overlay tracks the hole size
+                        const sz = r * 3.6;
+                        holeOverlay.style.width   = sz + 'px';
+                        holeOverlay.style.height  = sz + 'px';
+                        holeOverlay.style.opacity = '1';
 
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
@@ -777,7 +784,9 @@
                     requestAnimationFrame(animPhase1);
 
                     function startPhase2() {
-                        // Paper-hole layers already faded — jump straight into zoom
+                        // Fade paper hole overlay out as zoom begins
+                        holeOverlay.style.transition = 'opacity 0.22s ease-out';
+                        holeOverlay.style.opacity    = '0';
 
                         // ── Performance: hide only the fully-done animated elements ──
                         // Keep memo + mogi logo visible during zoom.
