@@ -835,6 +835,10 @@
                                 wallLayer.style.opacity = '0';
                                 holeVfx.style.opacity   = '0';
 
+                                // Settle glow to ~50% — keeps warmth without blowing out
+                                holeGlow.style.transition = 'opacity 0.6s ease-out';
+                                holeGlow.style.opacity    = '0.5';
+
                                 // Ease cs-content back to natural scale (was 1.04 → 1.0)
                                 if (csContent) {
                                     csContent.style.transition = 'transform 0.5s ease-out';
