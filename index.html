@@ -747,8 +747,8 @@
                             depthLayer.style.opacity      = '0';
                             tunnelShadow.style.transition = 'opacity 0.4s ease-out';
                             tunnelShadow.style.opacity    = '0';
-                            // Wait for the fade to finish, then a brief extra beat, then zoom
-                            setTimeout(startPhase2, 750);
+                            // ~400ms for fade to finish + 1s clean pause, then zoom
+                            setTimeout(startPhase2, 1400);
                         }
                     }
                     requestAnimationFrame(animPhase1);
