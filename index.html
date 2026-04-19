@@ -765,6 +765,20 @@
                         if (handOverlay) handOverlay.style.display  = 'none';
                         if (formEl)      formEl.style.display       = 'none';
 
+                        // ── GPU unlock: strip CSS filters that block compositing ──────
+                        // CSS filters (esp. drop-shadow) on children of a will-change:transform
+                        // element force the browser to CPU re-rasterize every frame.
+                        // Removing them lets wallLayer stay on its own GPU compositing layer.
+                        const memoImg = document.querySelector('.memo-base-img');
+                        if (memoImg) {
+                            // Keep colour grading; drop-shadow is the expensive compositor-breaking filter
+                            memoImg.style.filter = 'sepia(0.5) contrast(1.15) saturate(0.75) hue-rotate(-8deg)';
+                        }
+                        const brandGhostImg = document.querySelector('.brand-ghost img');
+                        if (brandGhostImg) brandGhostImg.style.filter = 'none';
+                        const mogiLogoEl = document.getElementById('mogiLogo');
+                        if (mogiLogoEl) mogiLogoEl.style.filter = 'none';
+
                         // ── Camera-POV zoom with jagged hole ─────────────────────────
                         // Switch from clip-path:url() (SVG ref — CPU-only, can't composite
                         // with transform) to clip-path:path(evenodd,'...') (CSS-native path
