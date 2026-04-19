@@ -170,10 +170,11 @@
             position: absolute;
             border-radius: 50%;
             background: radial-gradient(circle, rgba(255,140,30,0.3) 0%, rgba(255,60,10,0.12) 40%, transparent 70%);
-            transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%) scale(0);
             pointer-events: none; z-index: 4;
-            width: 0; height: 0; opacity: 0;
+            width: 260px; height: 260px; opacity: 0;
             transition: opacity 0.2s;
+            will-change: transform;
         }
         .cs-content {
             position: relative; z-index: 10;
@@ -673,6 +674,16 @@
                 wallLayer.style.clipPath = 'url(#wallHoleClip)';
             }
 
+            // Pre-decode all animation assets during idle time so no decode stall mid-animation
+            ['assets/spray-effect.png', 'assets/fist.png', 'assets/hand.png'].forEach(src => {
+                const img = new Image();
+                img.src = src;
+                if (img.decode) img.decode().catch(() => {});
+            });
+            document.querySelectorAll('img[src]').forEach(img => {
+                if (img.decode) img.decode().catch(() => {});
+            });
+
             // ── Dust particles ──────────────────────────────
             function spawnDust(cx, cy) {
                 const container = document.getElementById('dustContainer');
@@ -714,10 +725,9 @@
                     wallLayer.classList.add('shake');
                     setTimeout(() => wallLayer.classList.remove('shake'), 420);
 
-                    // Glow behind hole
-                    holeGlow.style.width   = '160px';
-                    holeGlow.style.height  = '160px';
-                    holeGlow.style.opacity = '1';
+                    // Glow behind hole (scale-based, no layout thrash)
+                    holeGlow.style.transform = 'translate(-50%,-50%) scale(0.615)';
+                    holeGlow.style.opacity   = '1';
 
                     // Activate clip-path (no paper overlay)
                     wallLayer.style.clipPath = 'url(#wallHoleClip)';
@@ -739,8 +749,7 @@
                         // Only update the SVG clip path and glow per frame — skip
                         // depthLayer/tunnelShadow/holeOverlay to avoid layout+paint every tick.
                         holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
-                        holeGlow.style.width  = (r * 2.4) + 'px';
-                        holeGlow.style.height = (r * 2.4) + 'px';
+                        holeGlow.style.transform = 'translate(-50%,-50%) scale(' + (r * 2.4 / 260).toFixed(4) + ')';
 
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
@@ -797,10 +806,11 @@
                         wallLayer.style.willChange      = 'transform';
                         wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
 
+                        // glowBase as a scale multiplier relative to the fixed 260px element
                         const glowBase    = 340;
+                        const glowBaseScale = glowBase / 260;
                         holeGlow.style.transition = 'none';
-                        holeGlow.style.width   = glowBase + 'px';
-                        holeGlow.style.height  = glowBase + 'px';
+                        holeGlow.style.transform = 'translate(-50%,-50%) scale(' + glowBaseScale.toFixed(4) + ')';
                         holeGlow.style.opacity = '1';
 
                         const phase2Dur   = 1700;
@@ -828,7 +838,7 @@
                             }
 
                             // Glow swells — transform only, no layout
-                            const gs = 1 + ease * glowMax;
+                            const gs = glowBaseScale + ease * glowMax;
                             holeGlow.style.transform = 'translate(-50%,-50%) scale(' + gs.toFixed(4) + ')';
 
                             if (p < 1) {
