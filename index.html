@@ -303,16 +303,16 @@
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
         @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(18vw,-28vw) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(10vw,-20vw) rotate(-15deg); }
-            20%  { transform:translate(-14vw,-11vw) rotate(-10deg); }
-            30%  { transform:translate(13vw,-2vw) rotate(-15deg); }
-            40%  { transform:translate(-11vw,8vw) rotate(-10deg); }
-            50%  { transform:translate(12vw,18vw) rotate(-15deg); }
-            60%  { transform:translate(-8vw,31vw) rotate(-5deg); }
-            75%  { transform:translate(10vw,43vw) rotate(-10deg); }
-            90%  { opacity:1; transform:translate(18vw,55vw) rotate(10deg); }
-            100% { opacity:0; transform:translate(26vw,66vw) rotate(20deg); }
+            0%   { opacity:0; transform:translate(16vw,-52vw) rotate(-20deg); }
+            8%   { opacity:1; transform:translate(13vw,-40vw) rotate(-15deg); }
+            20%  { transform:translate(-17vw,-22vw) rotate(-10deg); }
+            32%  { transform:translate(16vw,-4vw) rotate(-15deg); }
+            44%  { transform:translate(-16vw,15vw) rotate(-10deg); }
+            56%  { transform:translate(16vw,34vw) rotate(-15deg); }
+            68%  { transform:translate(-12vw,52vw) rotate(-5deg); }
+            80%  { transform:translate(14vw,70vw) rotate(-10deg); }
+            92%  { opacity:1; transform:translate(17vw,86vw) rotate(10deg); }
+            100% { opacity:0; transform:translate(20vw,102vw) rotate(20deg); }
         }
 
         /* Hand */
@@ -492,7 +492,7 @@
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 9999;
-            background: radial-gradient(ellipse at center, #150a03 0%, #060302 100%);
+            background: radial-gradient(ellipse at center, #1e0c03 0%, #0d0502 50%, #060302 100%);
             display: flex; flex-direction: column;
             justify-content: center; align-items: center;
             opacity: 0; pointer-events: none;
@@ -500,6 +500,14 @@
         }
         #comingSoonOverlay.active {
             opacity: 1; pointer-events: all;
+        }
+        /* Warm glow that matches the holeGlow peak — ensures no brightness snap on overlay snap-in */
+        #comingSoonOverlay .cs-overlay-glow {
+            position: absolute; top: 50%; left: 50%;
+            width: 220%; height: 220%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255,140,30,0.26) 0%, rgba(255,80,20,0.10) 30%, rgba(255,60,10,0.03) 55%, transparent 72%);
+            pointer-events: none; z-index: 1;
         }
         #comingSoonOverlay .cs-vhs-overlay { z-index: 2; }
         #comingSoonOverlay .cs-vhs-noise   { z-index: 3; }
@@ -787,11 +795,6 @@
                             const gs = 1 + ease * glowMax;
                             holeGlow.style.transform = 'translate(-50%,-50%) scale(' + gs.toFixed(4) + ')';
 
-                            // Fade glow out in the last 25% so the overlay snap has
-                            // nothing to contrast against — eliminates the brightness twitch
-                            const glowOpacity = p < 0.75 ? 1 : 1 - ((p - 0.75) / 0.25);
-                            holeGlow.style.opacity = glowOpacity.toFixed(3);
-
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
                             } else {
@@ -854,6 +857,7 @@
 
     <!-- Full-viewport coming soon overlay — z-index 9999, covers taskbar + IE chrome -->
     <div id="comingSoonOverlay">
+        <div class="cs-overlay-glow"></div>
         <div class="cs-vhs-overlay"></div>
         <div class="cs-vhs-noise"></div>
         <div class="cs-content">
