@@ -713,9 +713,9 @@
                     holeGlow.style.height  = '160px';
                     holeGlow.style.opacity = '1';
 
-                    // Activate clip-path and overlay
+                    // Activate clip-path (no paper overlay)
                     wallLayer.style.clipPath = 'url(#wallHoleClip)';
-                    setHole(cx, cy, 5, W, H);
+                    holeClipPath.setAttribute('d', buildHolePath(cx, cy, 5, W, H));
 
                     const peepR = 110;
                     const maxR  = Math.sqrt(W * W + H * H) * 0.82;
@@ -739,19 +739,8 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Settle depth layers at final peephole size (single paint)
-                            setHole(cx, cy, peepR, W, H);
-
-                            // Hold the paper hole visible for a beat, then fade it out
-                            setTimeout(() => {
-                                holeOverlay.style.transition  = 'opacity 0.4s ease-out';
-                                holeOverlay.style.opacity     = '0';
-                                depthLayer.style.transition   = 'opacity 0.45s ease-out';
-                                depthLayer.style.opacity      = '0';
-                                tunnelShadow.style.transition = 'opacity 0.45s ease-out';
-                                tunnelShadow.style.opacity    = '0';
-                                setTimeout(startPhase2, 800);
-                            }, 600);
+                            // No paper hole effect — brief beat then zoom
+                            setTimeout(startPhase2, 600);
                         }
                     }
                     requestAnimationFrame(animPhase1);
@@ -892,8 +881,11 @@
                         const isMobile = window.innerWidth <= 600;
                         const canDur = isMobile ? 2500 : 3000;
                         setTimeout(() => {
-                            sprayOverlay.style.transition = 'opacity 0.25s ease-out';
-                            sprayOverlay.style.opacity = '0';
+                            // Fade splatter + can quickly but keep logo visible
+                            const splatter = document.querySelector('.spray-splatter');
+                            const can = document.getElementById('sprayCan');
+                            if (splatter) { splatter.style.transition = 'opacity 0.25s ease-out'; splatter.style.opacity = '0'; }
+                            if (can)      { can.style.transition      = 'opacity 0.25s ease-out'; can.style.opacity      = '0'; }
                             setTimeout(triggerPunchSequence, 280);
                         }, canDur);
                     } else {
