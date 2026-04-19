@@ -303,16 +303,16 @@
         @keyframes spraySplatterAnim { 0%{opacity:0;transform:scale(0.8);} 20%{opacity:1;transform:scale(1);} 100%{opacity:0;} }
         @keyframes fadeInProgressive { from{opacity:0;filter:blur(15px);} to{opacity:0.95;filter:blur(0.5px);} }
         @keyframes sprayCanAnimMobile {
-            0%   { opacity:0; transform:translate(55vw,-50vw) rotate(-20deg); }
-            10%  { opacity:1; transform:translate(32vw,-32vw) rotate(-15deg); }
-            20%  { transform:translate(-38vw,-20vw) rotate(-10deg); }
-            30%  { transform:translate(34vw,-8vw) rotate(-15deg); }
-            40%  { transform:translate(-32vw,6vw) rotate(-10deg); }
-            50%  { transform:translate(35vw,22vw) rotate(-15deg); }
-            60%  { transform:translate(-26vw,46vw) rotate(-5deg); }
-            75%  { transform:translate(32vw,60vw) rotate(-10deg); }
-            90%  { opacity:1; transform:translate(48vw,75vw) rotate(10deg); }
-            100% { opacity:0; transform:translate(65vw,92vw) rotate(20deg); }
+            0%   { opacity:0; transform:translate(18vw,-28vw) rotate(-20deg); }
+            10%  { opacity:1; transform:translate(10vw,-20vw) rotate(-15deg); }
+            20%  { transform:translate(-14vw,-11vw) rotate(-10deg); }
+            30%  { transform:translate(13vw,-2vw) rotate(-15deg); }
+            40%  { transform:translate(-11vw,8vw) rotate(-10deg); }
+            50%  { transform:translate(12vw,18vw) rotate(-15deg); }
+            60%  { transform:translate(-8vw,31vw) rotate(-5deg); }
+            75%  { transform:translate(10vw,43vw) rotate(-10deg); }
+            90%  { opacity:1; transform:translate(18vw,55vw) rotate(10deg); }
+            100% { opacity:0; transform:translate(26vw,66vw) rotate(20deg); }
         }
 
         /* Hand */
@@ -786,6 +786,11 @@
                             // Glow swells — transform only, no layout
                             const gs = 1 + ease * glowMax;
                             holeGlow.style.transform = 'translate(-50%,-50%) scale(' + gs.toFixed(4) + ')';
+
+                            // Fade glow out in the last 25% so the overlay snap has
+                            // nothing to contrast against — eliminates the brightness twitch
+                            const glowOpacity = p < 0.75 ? 1 : 1 - ((p - 0.75) / 0.25);
+                            holeGlow.style.opacity = glowOpacity.toFixed(3);
 
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
