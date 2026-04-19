@@ -755,37 +755,49 @@
                         tunnelShadow.style.transition = 'opacity 0.28s ease-out';
                         tunnelShadow.style.opacity    = '0';
 
-                        // ── Expand the hole radius instead of scaling wallLayer ──
-                        // Scaling a clipped layer causes the circle artifact (only the
-                        // clipped disc zooms at you). Expanding the hole radius keeps the
-                        // wall correct (visible everywhere except inside the hole) and
-                        // delivers the same "rushing into the opening" feel via ease-in.
-                        const glowBase = 340;
+                        // ── True camera-POV zoom ──────────────────────────────────────
+                        // Instead of expanding the hole, we scale wallLayer toward the
+                        // viewer (camera moving forward). The wall rushes at you, the hole
+                        // grows in screen-space naturally as the wall gets closer.
+                        //
+                        // We switch from SVG clip-path (forces CPU raster on scale) to a
+                        // CSS mask radial-gradient. mask: transparent inside = hole, black
+                        // outside = wall — correct direction. CSS mask IS GPU-composited
+                        // with will-change:transform so no lag.
+                        const maskVal =
+                            'radial-gradient(circle ' + peepR + 'px at ' + cx + 'px ' + cy + 'px, ' +
+                            'transparent ' + peepR + 'px, black ' + peepR + 'px)';
+                        wallLayer.style.clipPath     = 'none';
+                        wallLayer.style.webkitMask   = maskVal;
+                        wallLayer.style.mask         = maskVal;
+                        wallLayer.style.willChange   = 'transform';
+                        wallLayer.style.transformOrigin = cx + 'px ' + cy + 'px';
+
+                        const glowBase    = 340;
                         holeGlow.style.transition = 'none';
                         holeGlow.style.width   = glowBase + 'px';
                         holeGlow.style.height  = glowBase + 'px';
                         holeGlow.style.opacity = '1';
 
-                        const phase2Dur = 1700;
-                        // Expand past full diagonal so the hole completely covers the wall
-                        const targetR   = Math.sqrt(W * W + H * H) * 1.05;
-                        const glowMax   = 2 + (Math.max(W, H) * 2.4) / glowBase;
-                        const csContent = document.querySelector('#comingSoonScene .cs-content');
+                        const phase2Dur   = 1700;
+                        // Scale until the mask hole (peepR × scale) covers full diagonal
+                        const targetScale = (Math.sqrt(W * W + H * H) / peepR) * 1.08;
+                        const glowMax     = 2 + (Math.max(W, H) * 2.4) / glowBase;
+                        const csContent   = document.querySelector('#comingSoonScene .cs-content');
                         let ts2 = null;
 
                         function animPhase2(ts) {
                             if (!ts2) ts2 = ts;
                             const p    = Math.min((ts - ts2) / phase2Dur, 1);
 
-                            // Cubic ease-in: starts slow, accelerates — feels like falling in
+                            // Cubic ease-in: slow start → rapid lunge (camera accelerates)
                             const ease = p * p * p;
 
-                            // Hole radius expands from peephole to full screen
-                            const r = peepR + ease * (targetR - peepR);
-                            // Only update the clip-path, skip depthLayer/tunnelShadow (fading out)
-                            holeClipPath.setAttribute('d', buildHolePath(cx, cy, r, W, H));
+                            // Wall rushes at camera — hole grows proportionally in screen space
+                            const scale = 1 + ease * (targetScale - 1);
+                            wallLayer.style.transform = 'scale(' + scale.toFixed(4) + ')';
 
-                            // Coming-soon content rushes up to meet camera (parallax depth)
+                            // ComingSoon content parallax: scene rushes up as camera dives
                             if (csContent) {
                                 const cs = 0.72 + ease * 0.32;
                                 csContent.style.transform = 'scale(' + cs.toFixed(4) + ')';
