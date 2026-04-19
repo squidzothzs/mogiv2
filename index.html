@@ -798,10 +798,17 @@
                             if (p < 1) {
                                 requestAnimationFrame(animPhase2);
                             } else {
-                                const csOverlay = document.getElementById('comingSoonOverlay');
-                                csOverlay.style.transition = 'none';
-                                csOverlay.classList.add('active');
-                                holeVfx.style.opacity = '0';
+                                // Hole now covers the entire screen — comingSoonScene is
+                                // already fully visible. Just freeze it here; no overlay snap.
+                                wallLayer.style.opacity = '0';
+                                holeVfx.style.opacity   = '0';
+
+                                // Ease cs-content back to natural scale (was 1.04 → 1.0)
+                                if (csContent) {
+                                    csContent.style.transition = 'transform 0.5s ease-out';
+                                    csContent.style.transform  = 'scale(1.0)';
+                                }
+
                                 const tb = document.querySelector('.taskbar');
                                 if (tb) {
                                     tb.style.transition    = 'none';
