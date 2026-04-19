@@ -341,14 +341,13 @@
         }
         #punchFist img { width: 100%; height: 100%; object-fit: contain; }
         #punchFist.punch-active {
-            animation: fistPunch 0.9s cubic-bezier(0.15, 0, 0.25, 1) forwards;
+            animation: fistPunch 0.45s cubic-bezier(0.1, 0, 0.3, 1) forwards;
         }
         @keyframes fistPunch {
-            0%   { opacity:0; transform:translate(-50%, calc(-50% - 280px)) scale(1.5); }
-            12%  { opacity:1; transform:translate(-50%, calc(-50% - 100px)) scale(1.25); }
-            32%  { opacity:1; transform:translate(-50%, -50%) scale(1.0); }
-            55%  { opacity:1; transform:translate(-50%, calc(-50% + 8px)) scale(0.97); }
-            100% { opacity:0; transform:translate(-50%, calc(-50% - 380px)) scale(0.85); }
+            0%   { opacity:0; transform:translate(-50%, calc(-50% - 220px)) scale(1.3); }
+            35%  { opacity:1; transform:translate(-50%, -50%) scale(1.0); }
+            60%  { opacity:1; transform:translate(-50%, calc(-50% + 6px)) scale(0.98); }
+            100% { opacity:0; transform:translate(-50%, calc(-50% + 6px)) scale(0.98); }
         }
 
         /* Screen shake applied to wallLayer */
@@ -702,15 +701,12 @@
                 punchFist.style.top  = cy + 'px';
                 punchFist.classList.add('punch-active');
 
-                // Impact at ~32% of 0.9s = ~290ms
+                // Impact at ~35% of 0.45s = ~160ms
                 setTimeout(() => {
+
                     // Shake
                     wallLayer.classList.add('shake');
                     setTimeout(() => wallLayer.classList.remove('shake'), 420);
-
-                    // Dust VFX
-                    spawnDust(cx, cy);
-                    holeVfx.classList.add('active');
 
                     // Glow behind hole
                     holeGlow.style.width   = '160px';
@@ -743,19 +739,19 @@
                         if (p < 1) {
                             requestAnimationFrame(animPhase1);
                         } else {
-                            // Settle depth layers at final peephole size (single paint, not per-frame)
+                            // Settle depth layers at final peephole size (single paint)
                             setHole(cx, cy, peepR, W, H);
 
-                            // Fist lands — immediately start fading the paper-hole layers
-                            // so the viewer sees them dissolve before the camera dives.
-                            holeOverlay.style.transition  = 'opacity 0.35s ease-out';
-                            holeOverlay.style.opacity     = '0';
-                            depthLayer.style.transition   = 'opacity 0.4s ease-out';
-                            depthLayer.style.opacity      = '0';
-                            tunnelShadow.style.transition = 'opacity 0.4s ease-out';
-                            tunnelShadow.style.opacity    = '0';
-                            // ~400ms for fade to finish + brief beat, then zoom
-                            setTimeout(startPhase2, 1400);
+                            // Hold the paper hole visible for a beat, then fade it out
+                            setTimeout(() => {
+                                holeOverlay.style.transition  = 'opacity 0.4s ease-out';
+                                holeOverlay.style.opacity     = '0';
+                                depthLayer.style.transition   = 'opacity 0.45s ease-out';
+                                depthLayer.style.opacity      = '0';
+                                tunnelShadow.style.transition = 'opacity 0.45s ease-out';
+                                tunnelShadow.style.opacity    = '0';
+                                setTimeout(startPhase2, 800);
+                            }, 600);
                         }
                     }
                     requestAnimationFrame(animPhase1);
@@ -865,7 +861,7 @@
                         requestAnimationFrame(animPhase2);
                     }
 
-                }, 290);
+                }, 160);
             }
 
             // ── Form submit ─────────────────────────────────
@@ -892,8 +888,14 @@
                         submitBtn.style.color = 'rgba(253,245,201,0.5)';
                         sprayOverlay.classList.add('spray-active');
 
-                        // Trigger punch shortly after spray can leaves (can finishes ~3s desktop / 2.5s mobile)
-                        setTimeout(triggerPunchSequence, 3200);
+                        // Fade spray out quickly once the can finishes, then trigger fist
+                        const isMobile = window.innerWidth <= 600;
+                        const canDur = isMobile ? 2500 : 3000;
+                        setTimeout(() => {
+                            sprayOverlay.style.transition = 'opacity 0.25s ease-out';
+                            sprayOverlay.style.opacity = '0';
+                            setTimeout(triggerPunchSequence, 280);
+                        }, canDur);
                     } else {
                         throw new Error('Server error');
                     }
