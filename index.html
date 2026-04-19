@@ -336,7 +336,6 @@
             height: clamp(180px, 32vw, 300px);
             z-index: 200; opacity: 0; pointer-events: none;
             transform: translate(-50%, -50%);
-            filter: drop-shadow(0 15px 25px rgba(0,0,0,0.95));
             will-change: transform, opacity;
         }
         #punchFist img { width: 100%; height: 100%; object-fit: contain; }
@@ -665,6 +664,13 @@
                     depthLayer.style.background   = 'transparent';
                     tunnelShadow.style.background = 'transparent';
                 }
+            }
+
+            // Pre-warm SVG clip-path so the first paint doesn't stall mid-animation
+            {
+                const W = appBody.offsetWidth, H = appBody.offsetHeight;
+                holeClipPath.setAttribute('d', buildHolePath(W/2, H/2, 0, W, H));
+                wallLayer.style.clipPath = 'url(#wallHoleClip)';
             }
 
             // ── Dust particles ──────────────────────────────
